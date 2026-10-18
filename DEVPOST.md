@@ -8,7 +8,9 @@ Most agent demos are one agent doing one task. I wanted agents reasoning about *
 
 Five AI agents, each dealt a random Arthurian character, play full games of *The Resistance: Avalon*: secret roles, team proposals, simultaneous votes, hidden quest cards, and the final assassination.
 
-Every move produces two things, stored separately: what the agent privately thinks and what it says out loud. A round-table viewer replays any game or follows one live. Turn on **Show secrets** and you see each player's real role and their private reasoning next to their public words, so you can watch an agent decide to lie and then lie. The viewer also flags players whose vote contradicts what they just said.
+Every move produces two things, stored separately: what the agent privately thinks and what it says out loud. A round-table viewer replays any game or follows one live. Turn on **Show secrets** and you see each player's real role and their private reasoning next to their public words, so you can watch an agent decide to lie and then lie. The viewer also flags players whose vote contradicts what they just said, draws a violet "Assassin's view" ring that fills as each player rejects teams containing Evil (Merlin's ring fills first), gives every character their own coat of arms, and can read the game aloud with a different voice per character.
+
+Visitors can deal a random game from the archive. Judges get a passcode that starts a brand-new live game from the browser.
 
 ## How we built it
 
