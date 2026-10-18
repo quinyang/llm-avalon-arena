@@ -63,7 +63,16 @@ def analyze(games: list[dict]) -> dict:
     winners = Counter(g["result"]["winner"] for g in games)
     reasons = Counter(g["result"]["reason"] for g in games)
 
-    assassinations = [g["result"] for g in games if g["result"]["merlin_guess"] is not None]
+    # Only count assassinations the model actually decided; a random fallback guess measures nothing.
+    assassinations, random_shots = [], 0
+    for g in games:
+        if g["result"]["merlin_guess"] is None:
+            continue
+        ev = next((e for e in g["events"] if e["phase"] == "assassinate"), {})
+        if ev.get("fallback"):
+            random_shots += 1
+        else:
+            assassinations.append(g["result"])
     survived = sum(r["merlin_survived"] for r in assassinations)
 
     # Evil quest behaviour: how often an Evil player on an approved quest actually played Fail.
@@ -122,7 +131,8 @@ def analyze(games: list[dict]) -> dict:
         "end_reasons": dict(reasons),
         "merlin": {"assassinations": len(assassinations), "survived": survived,
                    "survival": rate((survived, len(assassinations))),
-                   "random_baseline": RANDOM_MERLIN_SURVIVAL},
+                   "random_baseline": RANDOM_MERLIN_SURVIVAL,
+                   "excluded_fallback_assassinations": random_shots},
         "evil_fail_rate": rate((evil_fails, evil_seats)),
         "reject_rate_teams_with_evil": {r: rate(rej_evil[r]) for r in ROLES},
         "reject_rate_all_good_teams": {r: rate(rej_clean[r]) for r in ROLES},
@@ -149,7 +159,9 @@ def write_markdown(s: dict, path: Path) -> None:
         "",
         f"- **Merlin survived {m['survived']} of {m['assassinations']} assassinations** "
         f"({pct(m['survival']['rate'])}, 95% CI {pct(lo)} to {pct(hi)}). "
-        f"A random Assassin would let Merlin survive {pct(m['random_baseline'])} of the time.",
+        f"A random Assassin would let Merlin survive {pct(m['random_baseline'])} of the time."
+        + (f" ({m['excluded_fallback_assassinations']} assassination(s) where the model failed to answer and a random "
+           "target was used are excluded.)" if m["excluded_fallback_assassinations"] else ""),
         f"- Winners: Good {s['winners'].get('good', 0)}, Evil {s['winners'].get('evil', 0)}.",
         f"- How games ended: " + ", ".join(f"{k.replace('_', ' ')} {v}" for k, v in s["end_reasons"].items()) + ".",
         f"- Evil players on quests played Fail {s['evil_fail_rate']['k']} of {s['evil_fail_rate']['n']} times "

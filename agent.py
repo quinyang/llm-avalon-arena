@@ -129,13 +129,16 @@ class LLMAgent:
     def decide(self, public_state: dict, private_state: dict, legal: dict) -> Decision:
         assert private_state["player"] == self.player, "agent got another player's private state"
         system = system_prompt(private_state, self.personality, self.word_limit, self.table)
-        history = None if legal["type"] == "assassinate" else 10  # Assassin sees all table talk
+        # The Assassin gets more table talk than others, but not all of it: a full-game prompt made ASI's
+        # hidden reasoning overrun the token budget. The full vote table is always included.
+        history = 20 if legal["type"] == "assassinate" else 10
         user = render_state(public_state, self.player, history) + "\n\n" + phase_instruction(public_state, self.player, legal)
         tool = tool_for(legal, self.word_limit)
         messages: list = [{"role": "user", "content": user}]
         d = Decision(action={}, private_reasoning="", model=self.model)
 
-        for attempt in range(2):
+        attempts = 3 if legal["type"] == "assassinate" else 2  # the game-deciding move gets one more try
+        for attempt in range(attempts):
             try:
                 resp = self.client.messages.create(
                     model=self.model,
@@ -160,7 +163,7 @@ class LLMAgent:
                 return d
             except ValueError as e:
                 d.error = str(e)
-                if attempt == 0:
+                if attempt < attempts - 1 and attempt == 0:
                     messages.append({"role": "assistant", "content": resp.content})
                     fix = f"Invalid action: {e}. Call {tool['name']} again with a legal action."
                     if block is not None:
@@ -171,7 +174,7 @@ class LLMAgent:
                         messages.append({"role": "user", "content": fix})
 
         d.fallback = True
-        d.retries = 1
+        d.retries = attempts - 1
         d.action = random_legal(legal, self.rng)
         d.private_reasoning = d.private_reasoning or f"(fallback: random legal action after error: {d.error})"
         d.public_statement = d.action.get("statement")

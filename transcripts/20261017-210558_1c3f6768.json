@@ -1,0 +1,683 @@
+{
+  "game_id": "1c3f6768-66be-42a7-952f-34959112e79b",
+  "created_at": "2026-10-18T03:29:44+00:00",
+  "config": {
+    "models": {
+      "merlin": "asi1-fast",
+      "percival": "asi1-fast",
+      "loyal_servant": "asi1-fast",
+      "morgana": "asi1-fast",
+      "assassin": "asi1-fast"
+    },
+    "seat_models": {
+      "0": "asi1-fast",
+      "1": "asi1-fast",
+      "2": "asi1-fast",
+      "3": "asi1-fast",
+      "4": "asi1-fast"
+    },
+    "personalities": {
+      "0": "Lady Lynette, a devout knight who appeals to honor, oaths and the Round Table's ideals",
+      "1": "Sir Kay, a cynical sellsword who assumes everyone at the table is lying",
+      "2": "Sir Lamorak, a bookish scholar who reasons in odds and quotes the rules",
+      "3": "Sir Tristan, a hot-headed young knight desperate to prove themself, quick to accuse",
+      "4": "Sir Gawain, a cheerful jester who deflects with jokes but notices everything"
+    },
+    "characters": {
+      "0": {
+        "name": "Lady Lynette",
+        "temperament": "a devout knight who appeals to honor, oaths and the Round Table's ideals",
+        "quirk": "nurses an old grudge against Sir Kay and brings it up",
+        "playstyle": "cautious"
+      },
+      "1": {
+        "name": "Sir Kay",
+        "temperament": "a cynical sellsword who assumes everyone at the table is lying",
+        "quirk": "keeps a running tally of votes out loud",
+        "playstyle": "cautious"
+      },
+      "2": {
+        "name": "Sir Lamorak",
+        "temperament": "a bookish scholar who reasons in odds and quotes the rules",
+        "quirk": "calls the quests 'errands' and the leader 'the steward'",
+        "playstyle": "bold"
+      },
+      "3": {
+        "name": "Sir Tristan",
+        "temperament": "a hot-headed young knight desperate to prove themself, quick to accuse",
+        "quirk": "addresses other players formally by name",
+        "playstyle": "bold"
+      },
+      "4": {
+        "name": "Sir Gawain",
+        "temperament": "a cheerful jester who deflects with jokes but notices everything",
+        "quirk": "uses exactly one vivid metaphor each time they speak",
+        "playstyle": "cautious"
+      }
+    },
+    "discussion_rounds": 1,
+    "word_limit": 40,
+    "seed": 274195,
+    "fake": false,
+    "provider": "asi"
+  },
+  "roles": {
+    "0": "morgana",
+    "1": "percival",
+    "2": "merlin",
+    "3": "assassin",
+    "4": "loyal_servant"
+  },
+  "events": [
+    {
+      "t": 0,
+      "phase": "propose",
+      "quest": 1,
+      "attempt": 1,
+      "actor": 2,
+      "private_reasoning": "P0 and P3 are Evil from my Merlin sight; P1 and P4 are Good. I must assemble a clean team for this first errand. Taking myself and Sir Gawain gives us certain success if approved, and I should pitch it confidently without betraying hidden knowledge.",
+      "public_statement": "Steward's first errand calls for bold riders, not crowded councils. I propose Sir Gawain and myself\u2014two swords, clean odds. Let us ride promptly.",
+      "fallback": false,
+      "action": {
+        "team": [
+          2,
+          4
+        ]
+      }
+    },
+    {
+      "t": 1,
+      "phase": "discuss",
+      "quest": 1,
+      "attempt": 1,
+      "actor": 3,
+      "private_reasoning": "P2 and P4 are both Good\u2014since only P0 and I are Evil\u2014so this team will definitely pass Quest 1 if approved. I need to stop that and get Evil onto a quest. Perfect cover: Sir Tristan is hot-headed and offended at being snubbed, so rejecting this feels natural and hides my real motive.",
+      "public_statement": "Sir Lamorak, you speak of boldness yet pass over Sir Tristan? A young knight's blade hungers for first blood. I call this slight an insult and say we reject it!",
+      "fallback": false
+    },
+    {
+      "t": 2,
+      "phase": "discuss",
+      "quest": 1,
+      "attempt": 1,
+      "actor": 4,
+      "private_reasoning": "Since I know I'm Good, any team I'm on has one guaranteed Success. P3's tantrum about being left out feels theatrical and self-serving. Better to approve this lean squad and start gathering actual evidence than stall endlessly. I'll keep my eyes open though.",
+      "public_statement": "Like a cat eyeing a new mousehole, I'm cautious\u2014but I'll play my part. Two riders is a lean start, and I trust my own hand at least. Let's see where Lamorak's map leads.",
+      "fallback": false
+    },
+    {
+      "t": 3,
+      "phase": "discuss",
+      "quest": 1,
+      "attempt": 1,
+      "actor": 0,
+      "private_reasoning": "I know P2 and P4 are both Good because P3 is my Evil partner. If this team goes, Quest 1 succeeds and Good takes an early lead. Better to appear thoughtful and hard to win over now, so I look trustworthy later when I need to fail a quest.",
+      "public_statement": "I\u2019ve no love for Sir Kay, but two riders without Tristan\u2019s young eye? Caution first. I favor small bands, yet I need more than brave words before I raise my seal.",
+      "fallback": false
+    },
+    {
+      "t": 4,
+      "phase": "discuss",
+      "quest": 1,
+      "attempt": 1,
+      "actor": 1,
+      "private_reasoning": "I know P0 and P2 are Merlin and Morgana, but I don't know which is which. P4 could easily be the Assassin. As cautious Sir Kay, I want more data before trusting anyone. Rejecting this first proposal lets me watch how P0 and P2 respond to pressure, which helps me figure out who my real Merlin is. I'll state my skepticism clearly and keep my vote tally verbal quirk going.",
+      "public_statement": "Tally so far: Lamorak and Gawain riding forth, Tristan and Lynette holding fast. Four liars sit at this table. Two riders is lean, but I want proof, not poetry. Reject.",
+      "fallback": false
+    },
+    {
+      "t": 5,
+      "phase": "discuss",
+      "quest": 1,
+      "attempt": 1,
+      "actor": 2,
+      "private_reasoning": "I know P0 and P3 are Evil, so [P2,P4] is a guaranteed clean team. P3's theatrical objection and P0's vague caution are predictable self-interested deflections. P1 is Good but wary, which is fair\u2014he has no hard data yet. I must defend this proposal with public logic only: emotional appeals aren't evidence, and demanding proof before any errand runs is impossible by the rules. I'll cite the five-rejection risk to apply pressure.",
+      "public_statement": "Bold odds favor swift action. Sir Tristan's wounded pride is no grounds to reject; neither is wanting proof before any hand has played. Accept this lean team, or we court five rejections and Evil's victory by default.",
+      "fallback": false
+    },
+    {
+      "t": 6,
+      "phase": "vote",
+      "quest": 1,
+      "attempt": 1,
+      "leader": 2,
+      "team": [
+        2,
+        4
+      ],
+      "votes": {
+        "0": "approve",
+        "1": "reject",
+        "2": "approve",
+        "3": "reject",
+        "4": "approve"
+      },
+      "approved": true,
+      "reasoning": {
+        "0": "I know P3 and I are Evil, so P2 and P4 must both be Good. This team is guaranteed to succeed cleanly. As Morgana, I want Percival to think I have Merlin's hidden knowledge; approving a safe team supports that. I also distance myself from P3's public rejection.",
+        "1": "P2 and P4 proposed. P0 and P2 are Merlin/M Morgana. need evidence before commit. reject to see next leader's move. if pass and fails, one Evil here; if rejected, next leader's team may reveal more. caution first.",
+        "2": "[P2,P4] is clean because I know P4 is Good (only P0 and P3 are Evil). Voting against my own proposal would look bizarre and inconsistent. Even if P0, P1 and P3 reject, approving gives us information from the vote record while keeping my credibility intact.",
+        "3": "[P2,P4] are both Good because the only Evil players are P0 and me. If this passes, Quest 1 auto-succeeds and Good gets a free point. I must reject to block it. Rejecting also passes leadership to me next, letting me propose a team I can sabotage.",
+        "4": "I'm on this team, so I know at least one Success is guaranteed. If P2 is Evil and plays Fail, we catch them immediately; if P2 plays Success, Good takes an early lead. Rejecting now stalls the game and helps Evil. My caution shouldn't turn to paralysis on the very first proposal."
+      },
+      "fallbacks": []
+    },
+    {
+      "t": 7,
+      "phase": "quest",
+      "quest": 1,
+      "team": [
+        2,
+        4
+      ],
+      "fails": 0,
+      "succeeded": true,
+      "cards": {
+        "2": "success",
+        "4": "success"
+      },
+      "submitted": {
+        "2": "success",
+        "4": "success"
+      },
+      "reasoning": {
+        "2": "(automatic: Good can only play Success)",
+        "4": "(automatic: Good can only play Success)"
+      }
+    },
+    {
+      "t": 8,
+      "phase": "propose",
+      "quest": 2,
+      "attempt": 1,
+      "actor": 3,
+      "private_reasoning": "I'm the Assassin and P0 is Morgana. I want to fail Q2 without putting both Evil on the team. Excluding P0 avoids exposing us both. Including P2 (soft trust from Q1 success) and P1 (vocal skeptic) gives me cover if a Fail appears\u2014there are multiple suspects. I will play Fail.",
+      "public_statement": "Sir Kay demands proof, the steward showed his. Ride with me\u2014Sir Tristan\u2014and let this quest be the anvil of truth you seek.",
+      "fallback": false,
+      "action": {
+        "team": [
+          1,
+          2,
+          3
+        ]
+      }
+    },
+    {
+      "t": 9,
+      "phase": "discuss",
+      "quest": 2,
+      "attempt": 1,
+      "actor": 4,
+      "private_reasoning": "P3 rejected Q1 primarily because he wasn't included, which reads as either wounded pride or self-serving ambition. Now he rushes to propose a team starring himself alongside P2, whose success on Q1 proves nothing about his loyalty. I'm not eager to hand three seats to a knight who howls his way onto the roster. Unless someone changes my mind, this smells too convenient.",
+      "public_statement": "Like a cat watching a second mousehole, I'm twice as cautious. Sir Tristan cried insult at being skipped, then dashes to the table's head. Convenient speed, that.",
+      "fallback": false
+    },
+    {
+      "t": 10,
+      "phase": "discuss",
+      "quest": 2,
+      "attempt": 1,
+      "actor": 0,
+      "private_reasoning": "P3 is my evil partner, but I must avoid looking coordinated. Rejecting this builds my Good credibility since P4 also expressed suspicion about Tristan's sudden self-promotion. If the team passes and P3 fails it, I'll look prescient for objecting. Long-term, I need Percival to trust me over Merlin, so showing independent judgment is key.",
+      "public_statement": "Sir Kay and I bear old scars, but Tristan's leap from slighted squire to crowning himself king of this ride stinks of self-regard. Gawain proved true\u2014why cast aside a tested shield? Round Table honor demands better. I reject.",
+      "fallback": false
+    },
+    {
+      "t": 11,
+      "phase": "discuss",
+      "quest": 2,
+      "attempt": 1,
+      "actor": 1,
+      "private_reasoning": "",
+      "public_statement": "T tally: P3, P2, me. P0 and Gawain out. Tristan's leap stinks. Reject.",
+      "fallback": false
+    },
+    {
+      "t": 12,
+      "phase": "discuss",
+      "quest": 2,
+      "attempt": 1,
+      "actor": 2,
+      "private_reasoning": "P3 is Evil and proposing a team with himself guarantees at least one Fail card is possible. I know P0 and P3 are Evil, so the only clean trio for Q2 is [P1,P2,P4]. I need to reject this proposal without revealing my hidden knowledge. I'll base my objection purely on public behavior: P3 cried insult to force himself onto the team, and P4 is proven from Q1. Rejecting here also passes leadership to P4 (Good), who can propose the clean team.",
+      "public_statement": "Sir Tristan manufactured a slight to seize this saddle. A scholar recalculates: two untested riders plus grievance equals poor odds. Reject\u2014let the next steward choose proven steel.",
+      "fallback": false
+    },
+    {
+      "t": 13,
+      "phase": "discuss",
+      "quest": 2,
+      "attempt": 1,
+      "actor": 3,
+      "private_reasoning": "My team [P1,P2,P3] has exactly one Evil: me. If it passed I'd play Fail and tie the score 1-1. But P0, P1, P2, P4 all sound like they'll reject. I need to stay in character as hot-headed Tristan and attack the hypocrisy\u2014P2 demanded boldness when he led Q1, and P0 is clinging to P4. Bashing my own partner P0 actually helps our distance look real.",
+      "public_statement": "Sir Lamorak called for boldness when he held the map\u2014now he shivers? Lady Lynette wraps herself in Sir Gawain's shadow. You demand proof, then flee from it! Approve, or wear the coward's brand for all to see!",
+      "fallback": false
+    },
+    {
+      "t": 14,
+      "phase": "vote",
+      "quest": 2,
+      "attempt": 1,
+      "leader": 3,
+      "team": [
+        1,
+        2,
+        3
+      ],
+      "votes": {
+        "0": "reject",
+        "1": "reject",
+        "2": "reject",
+        "3": "approve",
+        "4": "reject"
+      },
+      "approved": false,
+      "reasoning": {
+        "0": "I publicly opposed this proposal already, and flipping now would link me to P3 in a way that risks exposing us both as Evil. P3 and I need distance, not mutual support, especially since Percival watches for Morgana's tells. The team is clearly doomed in the vote anyway, so I gain nothing by approving and lose my cautious credibility. Rejecting preserves my cover while costing us nothing\u2014zero rejections used so far leaves ample buffer.",
+        "1": "P2 is either Merlin or Morgana. If he's Evil, this team risks a Fail. P0's rejection aligns with caution. Better to reject and see next leader's move. Protect Merlin by not risking him in this team if P2 is him. Stay cautious.",
+        "2": "As Merlin I know P3 is Evil. Any team including him risks a Fail. I've already publicly opposed this, and rejecting passes leadership to P4\u2014who I know is Good\u2014giving us a chance at a guaranteed-clean proposal next. Consistency and caution both demand I vote Reject.",
+        "3": "The table talk makes it clear P0, P1, P2, and P4 are all rejecting this proposal, so my approval won't change the outcome. But as the Assassin I need to appear bold and eager for quests, not cautious. Approving maintains my Sir Tristan character and distances me from suspicion. P0 rejecting is perfect cover for our partnership. Even though this team will fail, I need to keep pushing to get onto a quest eventually so I can play Fail.",
+        "4": "P3's behavior is highly suspicious: he manufactured outrage at being excluded from Q1, then immediately proposed himself with two players who rejected that quest. Q1 succeeding doesn't clear P2, since Evil often plays Success to build trust. I don't want both P1 and P3\u2014who both rejected the first quest\u2014on a team together without more proof. I'll reject and likely lead next, where I can propose a safer team."
+      },
+      "fallbacks": []
+    },
+    {
+      "t": 15,
+      "phase": "propose",
+      "quest": 2,
+      "attempt": 2,
+      "actor": 4,
+      "private_reasoning": "P0 and P2 both approved the clean Q1 mission with me, while P3's solo-approval of his own Q2.1 team stinks of desperation. P1's chronic rejection of everything makes him impossible to read, so I'll stick with known quantities. If this trio passes, we either rack up another success or flush out a hidden traitor among us.",
+      "public_statement": "Like a cat returning to a warm hearth, I name Lady Lynette, Sir Lamorak, and myself. The first ride went clean; I see no reason to change the map.",
+      "fallback": false,
+      "action": {
+        "team": [
+          0,
+          2,
+          4
+        ]
+      }
+    },
+    {
+      "t": 16,
+      "phase": "discuss",
+      "quest": 2,
+      "attempt": 2,
+      "actor": 0,
+      "private_reasoning": "This team pairs me with Q1's proven riders; with P3 off the board, a single Fail won't expose me or my partner. I should endorse it warmly but cautiously, keeping to character.",
+      "public_statement": "Sir Kay's sneer aside, this team holds Lamorak and Gawain, who rode true once. I trust proven steel over proud words. Approve.",
+      "fallback": false
+    },
+    {
+      "t": 17,
+      "phase": "discuss",
+      "quest": 2,
+      "attempt": 2,
+      "actor": 1,
+      "private_reasoning": "P0 and P2 are Merlin and Morgana. Both in this team? Risky. P4's team could have one or two evil. Objecting now prevents a potential fail and draws suspicion away from Merlin. Next leader P0 may be better or worse, but this team's composition is too suspicious.",
+      "public_statement": "T tally: P0, P2, P4. P2 and P4 passed last time, but P0 wasn't there. ' proven steel' only for them. I need more. Reject.",
+      "fallback": false
+    },
+    {
+      "t": 18,
+      "phase": "discuss",
+      "quest": 2,
+      "attempt": 2,
+      "actor": 2,
+      "private_reasoning": "P0 is Evil and must not be on the quest. P4's proposal includes P0, which will likely fail. I must object to P0's inclusion to prevent this. Publicly, I'll reference P0's absence from Q1 to justify my objection without revealing my role.",
+      "public_statement": "P0's absence on Q1 means no proven loyalty. Trusting unproven steel risks the errand. Sir Kay's caution is scholarly. I object.",
+      "fallback": false
+    },
+    {
+      "t": 19,
+      "phase": "discuss",
+      "quest": 2,
+      "attempt": 2,
+      "actor": 3,
+      "private_reasoning": "Q1 had both P2 and P4 (they're Good since P0 and I are Evil), so they look clean. If P4's team [P0,P2,P4] passes, P0 is forced to either play Success (giving Good a point) or Fail (exposing themselves as the obvious culprit since P2/P4 are \"proven\"). Rejecting protects P0 and passes leadership to P0, who can propose a team with me on it\u2014then I can play Fail while P0 plays Success, hiding us both.",
+      "public_statement": "Lady Lynette dares wrap herself in 'proven steel' after watching from the gallery? Sir Gawain names his own hearth! This same clique sneered at my bold ride. I'll not bless their shadow-play. Reject.",
+      "fallback": false
+    },
+    {
+      "t": 20,
+      "phase": "discuss",
+      "quest": 2,
+      "attempt": 2,
+      "actor": 4,
+      "private_reasoning": "P2 and I are proven good from Q1. P0's role is unknown, but if we reject this team, next leader P0 might propose a team with P1 or P3, which could be worse. Need to pass this to avoid more rejections. P2's objection is odd for a good player; he might be evil, but I can't risk that. Better to pass now and see if P0 plays a fail.",
+      "public_statement": "Like a juggling act with three balls, P0 is the new one, but we've got two steady hands. Let's not drop the whole show over one uncertain toss.",
+      "fallback": false
+    },
+    {
+      "t": 21,
+      "phase": "vote",
+      "quest": 2,
+      "attempt": 2,
+      "leader": 4,
+      "team": [
+        0,
+        2,
+        4
+      ],
+      "votes": {
+        "0": "approve",
+        "1": "reject",
+        "2": "reject",
+        "3": "approve",
+        "4": "approve"
+      },
+      "approved": true,
+      "reasoning": {
+        "0": "I already publicly endorsed this team in discussion, so flipping to reject would shred my credibility as a cautious-but-reasonable Good player. The proposal is almost certainly doomed anyway\u2014P1, P2, and P3 all signaled reject\u2014so my approval costs nothing and keeps my cover intact. If it somehow passes, I\u2019ll play Success to avoid exposure as the lone new face beside two Q1 Successes.",
+        "1": "P2 is on the team but voting to reject, a clear red flag for Evil. P0 must be Merlin. Reject to let P0 lead next and propose a safer team. P4's role uncertain, but P2's behavior is suspicious and aligns with Morgana's tactics.",
+        "2": "I know P0 is Evil. If this team passes, she can single-handedly fail the errand. Rejecting preserves our clean score and is consistent with my prior objection. We have rejection slots left; better to wait for a team of proven riders than gamble on P0.",
+        "3": "P0 is my Evil partner and can play a hidden Fail here without exposing either of us. I\u2019m the swing vote; approving guarantees a tied score at 1-1, which is far better for Evil than passing up a free point. Rejecting would waste this chance and leave me looking inconsistent for no strategic gain. I\u2019ll take the fail and let the Good players squabble over blame.",
+        "4": "P2 rejecting his own team is strange, but Q1 succeeded with me and him. P0's support is promising. I'll approve to pass this team, though I'm keeping an eye on Lamorak's shifting stance."
+      },
+      "fallbacks": []
+    },
+    {
+      "t": 22,
+      "phase": "quest",
+      "quest": 2,
+      "team": [
+        0,
+        2,
+        4
+      ],
+      "fails": 0,
+      "succeeded": true,
+      "cards": {
+        "0": "success",
+        "2": "success",
+        "4": "success"
+      },
+      "submitted": {
+        "0": "success",
+        "2": "success",
+        "4": "success"
+      },
+      "reasoning": {
+        "0": "P2 and P4 just succeeded together on Q1. If this quest fails, I'm the obvious suspect as the new variable on the team. Playing Success builds crucial trust and keeps my Morgana cover intact. P3 can fail a future quest when the heat isn't squarely on me. One success won't lose us the war; exposing myself here would.",
+        "2": "(automatic: Good can only play Success)",
+        "4": "(automatic: Good can only play Success)"
+      }
+    },
+    {
+      "t": 23,
+      "phase": "propose",
+      "quest": 3,
+      "attempt": 1,
+      "actor": 0,
+      "private_reasoning": "Propose P0 and P4. P4 has proven loyalty from Q1 and Q2. P3 will approve, ensuring pass. I'll play Fail to end the quest while keeping my role hidden.",
+      "public_statement": "Sir Gawain and I trust in proven loyalty; our first ride was clean. I propose we continue with trusted allies for this next step.",
+      "fallback": false,
+      "action": {
+        "team": [
+          0,
+          4
+        ]
+      }
+    },
+    {
+      "t": 24,
+      "phase": "discuss",
+      "quest": 3,
+      "attempt": 1,
+      "actor": 1,
+      "private_reasoning": "I increasingly believe P2 is Merlin and P0 is Morgana. P2 rejected Q2.2 that included themselves\u2014strong evidence of Merlin avoiding a team with P0 (evil). Rejecting P0\u2019s proposal also passes leadership to me (P1), letting me control the next team for Q3. I\u2019ll keep my character\u2019s cynical tally and unproven-steel logic.",
+      "public_statement": "One ride don't make Lady Lynette clean. Gawain's doubled his proof, but his partner's green. My tally reads: reject.",
+      "fallback": false
+    },
+    {
+      "t": 25,
+      "phase": "discuss",
+      "quest": 3,
+      "attempt": 1,
+      "actor": 2,
+      "private_reasoning": "P0 is Evil and on a 2-person team, she'd be outing herself to play Fail\u2014so she'll likely play Success, handing Good an immediate 3-0 win and forcing Assassination next. That's dangerous: I've already been too right about P3. I must not be the loudest accuser. Instead I'll follow P1's existing objection and frame it in odds/ledger terms using only public evidence (P0 has only one quest under her belt). This keeps me consistent and less obviously well-informed, while hoping the team gets rejected so a different steward can propose next.",
+      "public_statement": "Sir Kay's tally is sound. The steward bears one errand, watched by two riders. Proven pairs exist; the odds reject this gamble. Reject.",
+      "fallback": false
+    },
+    {
+      "t": 26,
+      "phase": "discuss",
+      "quest": 3,
+      "attempt": 1,
+      "actor": 3,
+      "private_reasoning": "P0 and I need this team to pass so P0 can play Fail. P4 is Good, so he'll play success, making the quest fail. I'll approve to get it passed. If rejected, next leader might propose a different team, but this is our best chance to fail Q3 now.",
+      "public_statement": "Gawain's proven, Lynette's on point. I approve. No more delays!",
+      "fallback": false
+    },
+    {
+      "t": 27,
+      "phase": "discuss",
+      "quest": 3,
+      "attempt": 1,
+      "actor": 4,
+      "private_reasoning": "A 2-person quest with me is a perfect trap. Since I'm Good, any Fail nails the other rider. Evil can't afford another Success, so if P0 is Evil this should fail and expose them. P3's sudden eagerness is still fishy, but P1 and P2's steady caution reads as Good to me.",
+      "public_statement": "Like a coin with one face shown, I'll flip it with Lady Lynette. A two-rider quest is the anvil that tests her metal.",
+      "fallback": false
+    },
+    {
+      "t": 28,
+      "phase": "discuss",
+      "quest": 3,
+      "attempt": 1,
+      "actor": 0,
+      "private_reasoning": "P3 and P4 support, so this passes. I'll playFail to get our first loss. P1 and P2's 'T tally' is just their usual doubt; their objections won't stick. keeping it low risk for now.",
+      "public_statement": "Sir Kay, our old scars run deep, but this 'T tally' is just sourness. I've kept my oaths; trust Gawain and me. No delays for shadows.",
+      "fallback": false
+    },
+    {
+      "t": 29,
+      "phase": "vote",
+      "quest": 3,
+      "attempt": 1,
+      "leader": 0,
+      "team": [
+        0,
+        4
+      ],
+      "votes": {
+        "0": "approve",
+        "1": "reject",
+        "2": "reject",
+        "3": "approve",
+        "4": "approve"
+      },
+      "approved": true,
+      "reasoning": {
+        "0": "Rejecting my own proposal would be an instant tell that I\u2019m Evil, destroying all the trust I\u2019ve built. If this two-rider quest fails, blame falls almost entirely on me since P4 has two prior successes to my one, so I cannot play Fail here. I\u2019ll play Success to stay hidden and depend on P3\u2019s assassin shot later, as outing myself now helps us far less than preserving cover.",
+        "1": "",
+        "2": "P0 is a confirmed Evil in my eyes; Q2's success was only possible because they threw a Success card to build trust. Approving [P0, P4] risks catastrophe\u2014either a Fail now or an accelerated trip to the assassination phase at 3-0 where my quiet cover matters more. P1 is next leader and can propose among the clean pool. I stick with my stated objection.",
+        "3": "P0 is Morgana, my Evil partner. If [P0,P4] is approved, P0 can play Fail to make this quest fail. Since both Morgana and I are not on the team together, only Morgana will play Fail - which is safe since a single Fail reveals nothing about which of the two played it. I should approve this proposal to get Evil on the scoreboard.",
+        "4": "P1 has blindly rejected every proposal including two that succeeded, and P2 suspiciously rejected his own team on Q2.2\u2014both smell off. I know I'm good, so if [P0,P4] fails I'll learn P0 is evil. At 2-0 we can afford one fail, and I'd rather test P0 now than hand the reins to P1."
+      },
+      "fallbacks": []
+    },
+    {
+      "t": 30,
+      "phase": "quest",
+      "quest": 3,
+      "team": [
+        0,
+        4
+      ],
+      "fails": 1,
+      "succeeded": false,
+      "cards": {
+        "0": "fail",
+        "4": "success"
+      },
+      "submitted": {
+        "0": "fail",
+        "4": "success"
+      },
+      "reasoning": {
+        "0": "Q3 must fail to prevent Good from winning immediately. P4 is Good, so my Fail will be the only one. Exposure risk is necessary; if this succeeds, Evil loses. My role as Morgana requires this sacrifice to prolong the game for the Assassin's later opportunity.",
+        "4": "(automatic: Good can only play Success)"
+      }
+    },
+    {
+      "t": 31,
+      "phase": "propose",
+      "quest": 4,
+      "attempt": 1,
+      "actor": 1,
+      "private_reasoning": "P0's Q3 failure suggests he's evil. P2's consistent success points to Merlin. P4's in two successes; likely good. Team P1, P2, P4 should succeed. Protect Merlin by keeping him in trusted team.",
+      "public_statement": "P0 failed last time. P2 and P4's proven. I propose myself, P2, P4. No more risks. T tally: 3 for success.",
+      "fallback": false,
+      "action": {
+        "team": [
+          1,
+          2,
+          4
+        ]
+      }
+    },
+    {
+      "t": 32,
+      "phase": "discuss",
+      "quest": 4,
+      "attempt": 1,
+      "actor": 2,
+      "private_reasoning": "I know P0 and P3 are Evil, so [P1,P2,P4] is a perfectly clean team for Q4. I must support it, but only cite public evidence: P0 rode the failed Q3 while P2 and P4 have two successes. I won't mention P3 to avoid looking omniscient. Being bold but grounded in visible history fits Sir Lamorak.",
+      "public_statement": "Proven steel rides with P2 and P4; P0 carried the failing errand. Sir Kay's roster shuns that risk. By the rules, this is our cleanest hand. Approve.",
+      "fallback": false
+    },
+    {
+      "t": 33,
+      "phase": "discuss",
+      "quest": 4,
+      "attempt": 1,
+      "actor": 3,
+      "private_reasoning": "P1's team is all Good; they'll pass this quest. I must object to misdirect suspicion onto P2 and P4, even though they're Good. False accusations may cause future teams to exclude them, giving me a chance to join a team with P0 and fail a quest later.",
+      "public_statement": "P2 and P4's ' proven steel' is a facade. Their loyalty is tested only by their absence from the last failure. I object to this reckless alliance.",
+      "fallback": false
+    },
+    {
+      "t": 34,
+      "phase": "discuss",
+      "quest": 4,
+      "attempt": 1,
+      "actor": 4,
+      "private_reasoning": "P0 is confirmed evil: Q3 [P0,P4] failed 1-0, and as good I played success. P2 is proven good from Q1 [P2,P4]. P3 has a damning pattern of approving every team containing P0 (Q2.2 and Q3.1), while P1 and P2 rejected both. So P3 is almost certainly the other evil, making P1 good. Team [P1,P2,P4] is all-good and wins the game if it succeeds. I'll point out P3's curious bookkeeping while backing the clean team.",
+      "public_statement": "Like a jester reading the king's ledger, P3 backed every ride P0 took\u2014curious bookkeeping! I'll ride with proven steel: Kay, Lamorak, and me. Approve.",
+      "fallback": false
+    },
+    {
+      "t": 35,
+      "phase": "discuss",
+      "quest": 4,
+      "attempt": 1,
+      "actor": 0,
+      "private_reasoning": "",
+      "public_statement": "Sir Kay, your 'proven steel' is just a mask. I recall your past betrayals when we trusted you. I object to this team.",
+      "fallback": false
+    },
+    {
+      "t": 36,
+      "phase": "discuss",
+      "quest": 4,
+      "attempt": 1,
+      "actor": 1,
+      "private_reasoning": "P0's 'betrayals' claim is a clear Morgana tactic to deflect suspicion. P2 is likely Merlin, so this team protects him while keeping P0 off. P4's consistent success with P2 suggests Good. P3's objection is suspicious for a Good player. This is the safest option.",
+      "public_statement": "P0's 'betrayals' is a mask. P2 and P4 proven. T tally: 3. approve.",
+      "fallback": false
+    },
+    {
+      "t": 37,
+      "phase": "vote",
+      "quest": 4,
+      "attempt": 1,
+      "leader": 1,
+      "team": [
+        1,
+        2,
+        4
+      ],
+      "votes": {
+        "0": "reject",
+        "1": "approve",
+        "2": "approve",
+        "3": "reject",
+        "4": "approve"
+      },
+      "approved": true,
+      "reasoning": {
+        "0": "",
+        "1": "Q3 failed with P0 and P4. Since I know P0 is either Merlin or Morgana, and P4 is outside that pair, P0 must have played the Fail\u2014making P0 Morgana and P2 Merlin. That means P1, P2, and P4 are all Good. [P1,P2,P4] is a guaranteed success and gets Good to 3 wins.",
+        "2": "This roster is clean: P1, P2 and P4 are all Good, and it keeps both Evil players (P0 and P3) off the team, guaranteeing a successful fourth errand. Winning this quest gives Good the required third success and forces the Assassin to guess\u2014better to reach that phase than risk another Evil failure. I already publicly endorsed this team, so voting reject would look bizarre and inconsistent.",
+        "3": "Team is all Good (P1, P2, P4), so they'll all play success. Q4 success would lead to 3-1 Good win. But since we can't stop it, object to maintain suspicion on P2/P4's ' proven steel' facade. Next leader may propose a team with P0, which we can fail in Q5.",
+        "4": "P0 is confirmed evil to me\u2014Q3 [P0,P4] had 1 fail and I played Success, so P0 played Fail. P2 is almost certainly good (played Success on Q1 when they could have easily failed it). P1 has rejected every team containing P0, which is exactly what a good player would do. P3, by contrast, approved both [P0,P2,P4] and [P0,P4], making them the likely second evil. The team [P1,P2,P4] is almost certainly clean\u2014three good players. Approving gives us our 3rd success and nearly seals the game. I'll approve cautiously but confidently."
+      },
+      "fallbacks": []
+    },
+    {
+      "t": 38,
+      "phase": "quest",
+      "quest": 4,
+      "team": [
+        1,
+        2,
+        4
+      ],
+      "fails": 0,
+      "succeeded": true,
+      "cards": {
+        "1": "success",
+        "2": "success",
+        "4": "success"
+      },
+      "submitted": {
+        "1": "success",
+        "2": "success",
+        "4": "success"
+      },
+      "reasoning": {
+        "1": "(automatic: Good can only play Success)",
+        "2": "(automatic: Good can only play Success)",
+        "4": "(automatic: Good can only play Success)"
+      }
+    },
+    {
+      "t": 39,
+      "phase": "assassinate",
+      "quest": 4,
+      "attempt": 1,
+      "actor": 3,
+      "private_reasoning": "(fallback: random legal action after error: no tool call in response (stop_reason=length; rescue=length))",
+      "public_statement": null,
+      "fallback": true,
+      "action": {
+        "target": 2
+      }
+    }
+  ],
+  "result": {
+    "winner": "evil",
+    "reason": "merlin_assassinated",
+    "merlin_actual": 2,
+    "merlin_guess": 2,
+    "merlin_survived": false,
+    "quests": [
+      true,
+      true,
+      false,
+      true
+    ],
+    "proposals": 5
+  },
+  "stats": {
+    "proposals": 5,
+    "total_rejections": 1,
+    "llm_calls": 66,
+    "input_tokens": 151652,
+    "output_tokens": 526441,
+    "tokens": 678093,
+    "cost_usd": null,
+    "retries": 7,
+    "parse_failures": 1,
+    "duration_s": 2173.6
+  }
+}
