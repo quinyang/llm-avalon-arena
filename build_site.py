@@ -1,4 +1,4 @@
-"""Build the static site in docs/ for GitHub Pages: the viewer plus a few hand-picked games.
+"""Build the static site in docs/ for GitHub Pages: the viewer, featured games, and the full archive.
 
     python build_site.py                          # uses FEATURED below
     python build_site.py --game transcripts/X.json "Title shown in the menu" --game ...
@@ -27,6 +27,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--game", nargs=2, action="append", metavar=("FILE", "TITLE"),
                     help="transcript path and menu title (repeatable); replaces FEATURED")
+    ap.add_argument("--only-featured", action="store_true", help="leave the rest of the archive out")
     args = ap.parse_args()
     games = [(Path(f).name, t) for f, t in args.game] if args.game else FEATURED
 
@@ -39,7 +40,7 @@ def main() -> None:
     if (ROOT / "analysis" / "summary.png").exists():
         shutil.copy(ROOT / "analysis" / "summary.png", DOCS / "results.png")
 
-    index = []
+    index, featured_files = [], set()
     for name, title in games:
         src = ROOT / "transcripts" / name
         if not src.exists():
@@ -48,11 +49,25 @@ def main() -> None:
         if not t.get("result"):
             raise SystemExit(f"{name} is not a finished game")
         shutil.copy(src, out / name)
-        index.append({"file": name, "title": title})
+        index.append({"file": name, "title": title, "featured": True})
+        featured_files.add(name)
+    # Everything else goes in the archive that "Deal a new table" draws from.
+    if not args.only_featured:
+        for src in sorted((ROOT / "transcripts").glob("2*.json"), reverse=True):
+            if src.name in featured_files:
+                continue
+            t = json.loads(src.read_text())
+            if not t.get("result") or t.get("config", {}).get("fake"):
+                continue
+            shot = next((e for e in t["events"] if e["phase"] == "assassinate"), None)
+            if shot and shot.get("fallback"):
+                continue  # the climax was a random pick, not a decision: not worth showing
+            shutil.copy(src, out / src.name)
+            index.append({"file": src.name, "title": None, "featured": False})
     (out / "index.json").write_text(json.dumps({"games": index}, indent=2))
-    print(f"built {DOCS}/ with {len(index)} games:")
+    print(f"built {DOCS}/ with {len(index)} games ({len(featured_files)} featured):")
     for g in index:
-        print(f"  {g['title']}  ({g['file']})")
+        print(f"  {g['title'] or '(archive)'}  {g['file']}")
 
 
 if __name__ == "__main__":

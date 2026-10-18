@@ -63,6 +63,22 @@ Viewer extras: crests per character, the violet "Assassin's view" ring (share of
 rejected; secrets mode), **Jump to key moments** (N), and **voice-over** (V): each character gets a system voice with
 pitch and pace from their temperament; "+ thoughts" also reads private reasoning in a softer inner voice.
 
+## Live table for judges (server.py)
+
+Lets people with a passcode start a real game from the browser while everyone else watches. Runs on your Mac;
+the API key never leaves it.
+
+```bash
+export ASI_ONE_API_KEY='...'
+export AVALON_PASSCODE='something-for-judges'    # without it, nobody can start games
+python server.py                                 # http://localhost:8000
+brew install cloudflared                         # once
+cloudflared tunnel --url http://localhost:8000   # prints a public https://….trycloudflare.com link
+```
+
+Limits: one game at a time, `AVALON_MAX_GAMES` per day (default 6), 60 s cooldown. Only the viewer,
+transcripts and the results chart are served. Keep the Mac awake (`caffeinate -i`).
+
 ## Results
 
 ```bash
@@ -92,6 +108,8 @@ each transcript and shown in the viewer, with role emblems when secrets are on.
 | `fake_client.py` | Offline stand-in for the Anthropic client (random, sometimes invalid, tool calls) |
 | `sim.py` | Random-bot driver + invariant checks |
 | `analyze.py` | Stats + chart from all finished transcripts |
+| `server.py` | Live table: viewer + passcode-protected "Start a new game" |
+| `build_site.py` | Static site in `docs/` for GitHub Pages (featured games + archive) |
 | `viewer.html` | Round-table replay and live view: tracks, votes, quest cards, thoughts vs speech |
 
 ## Design notes

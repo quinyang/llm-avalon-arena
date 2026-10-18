@@ -2,15 +2,68 @@
   "games": [
     {
       "file": "20261017-201032_5ff60354.json",
-      "title": "Percival takes the bullet: Good wins, Merlin survives"
+      "title": "Percival takes the bullet: Good wins, Merlin survives",
+      "featured": true
     },
     {
       "file": "20261017-182845_bf161d62.json",
-      "title": "Merlin's first-turn slip: the Assassin finds him"
+      "title": "Merlin's first-turn slip: the Assassin finds him",
+      "featured": true
     },
     {
       "file": "20261017-202152_24e15306.json",
-      "title": "Five-quest epic: 11 proposals, decided by the Assassin"
+      "title": "Five-quest epic: 11 proposals, decided by the Assassin",
+      "featured": true
+    },
+    {
+      "file": "20261017-205119_be1ed1fa.json",
+      "title": null,
+      "featured": false
+    },
+    {
+      "file": "20261017-204639_3df9b23a.json",
+      "title": null,
+      "featured": false
+    },
+    {
+      "file": "20261017-204601_d92ff4de.json",
+      "title": null,
+      "featured": false
+    },
+    {
+      "file": "20261017-204320_e43b92c1.json",
+      "title": null,
+      "featured": false
+    },
+    {
+      "file": "20261017-201603_9f0cf941.json",
+      "title": null,
+      "featured": false
+    },
+    {
+      "file": "20261017-192535_edb98e0f.json",
+      "title": null,
+      "featured": false
+    },
+    {
+      "file": "20261017-192423_7669852d.json",
+      "title": null,
+      "featured": false
+    },
+    {
+      "file": "20261017-191130_c66db9d8.json",
+      "title": null,
+      "featured": false
+    },
+    {
+      "file": "20261017-190733_b16b0a6c.json",
+      "title": null,
+      "featured": false
+    },
+    {
+      "file": "20261017-185218_8fbc63db.json",
+      "title": null,
+      "featured": false
     }
   ]
 }

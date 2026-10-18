@@ -72,6 +72,13 @@ select, .btn {
 .btn { cursor: pointer; }
 .btn:hover { border-color: var(--muted); }
 .btn.secret[aria-pressed="true"] { background: var(--thought); color: var(--hall); border-color: var(--thought); font-weight: 700; }
+.table-ctl { display: inline-flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.table-ctl[hidden], .pass-box[hidden], .btn[hidden] { display: none; }
+.pass-box { display: inline-flex; gap: 6px; }
+.pass-box input { background: var(--hall); border: 1px solid var(--rule); border-radius: 6px; padding: 6px 10px; width: 11em; }
+.btn.start { background: var(--gold); color: var(--hall); border-color: var(--gold); font-weight: 700; }
+.btn.live { border-color: var(--thought); color: var(--thought); font-weight: 700; }
+.table-msg { color: var(--muted); font-size: 14px; }
 label.check { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 14px; }
 
 /* ------------------------------------------------------------ main layout */
@@ -242,6 +249,16 @@ body.dragging .drop-hint { display: grid; }
   <h1>Avalon Arena</h1>
   <div class="controls-top">
     <select id="picker" aria-label="Choose a saved game"><option value="">Loading games…</option></select>
+    <button class="btn" id="deal" hidden title="Replay a random game from the archive (D)">Deal a new table</button>
+    <span class="table-ctl" id="tableCtl" hidden>
+      <button class="btn start" id="startBtn" hidden>Start a new game</button>
+      <span class="pass-box" id="passBox" hidden>
+        <input type="password" id="pass" placeholder="Judge passcode" autocomplete="off" aria-label="Judge passcode">
+        <button class="btn start" id="passGo">Start</button>
+      </span>
+      <button class="btn live" id="watchLive" hidden>Watch the live game</button>
+      <span class="table-msg" id="tableMsg" aria-live="polite"></span>
+    </span>
     <label class="btn" for="file">Open file</label>
     <input id="file" type="file" accept=".json,application/json" hidden>
     <button class="btn secret" id="god" aria-pressed="false" title="Shortcut: S">Show secrets</button>
@@ -821,6 +838,7 @@ async function loadUrl(url) {
   try {
     const t = await fetchJson(url);
     useTranscript(t, url, false);
+    if ([...$("picker").options].some((o) => o.value === url)) $("picker").value = url;  // menu always names what's on screen
     if (isLiveUrl(url)) { $("follow").checked = true; go(steps.length - 1); setPlaying(true); }
     else setPlaying(false);
   } catch (err) { showError(`Could not load ${url}: ${err.message}`); }
@@ -833,7 +851,7 @@ async function listTranscripts() {
     if (r.ok) {
       const idx = await r.json();
       STATIC_SITE = true;
-      TITLES = Object.fromEntries(idx.games.map((g) => [g.file, g.title]));
+      TITLES = Object.fromEntries(idx.games.filter((g) => g.title).map((g) => [g.file, g.title]));
       return idx.games.map((g) => g.file);
     }
   } catch { /* fall through to directory listing */ }
@@ -865,8 +883,9 @@ function label(f, t) {
   return `${when}: ${t.result.winner === "good" ? "Good" : "Evil"} wins, ${why}`;
 }
 
-async function loadIndex() {
+async function loadIndex(initial = true) {
   const picker = $("picker");
+  const keep = picker.value;
   let files = [];
   try {
     files = await listTranscripts();
@@ -883,7 +902,19 @@ async function loadIndex() {
   }
   if (!files.length) { picker.innerHTML = `<option value="">No saved games yet</option>`; showEmpty(false); return; }
   const metas = await Promise.all(files.map((f) => fetchJson("transcripts/" + f).catch(() => null)));
-  picker.innerHTML = files.map((f, i) => `<option value="transcripts/${esc(f)}">${esc(TITLES[f] || label(f, metas[i]))}</option>`).join("");
+  const opt = (f, i) => `<option value="transcripts/${esc(f)}">${esc(TITLES[f] || label(f, metas[i]))}</option>`;
+  const feat = files.map((f, i) => [f, i]).filter(([f]) => TITLES[f]);
+  const rest = files.map((f, i) => [f, i]).filter(([f]) => !TITLES[f]);
+  picker.innerHTML = feat.length
+    ? `<optgroup label="Featured games">${feat.map(([f, i]) => opt(f, i)).join("")}</optgroup>` +
+      (rest.length ? `<optgroup label="Archive">${rest.map(([f, i]) => opt(f, i)).join("")}</optgroup>` : "")
+    : files.map(opt).join("");
+  $("deal").hidden = files.filter((f) => !f.startsWith("live_")).length < 2;
+  if (!initial) {  // refreshing the menu: keep watching whatever is on screen
+    if (sourceUrl && [...picker.options].some((o) => o.value === sourceUrl)) picker.value = sourceUrl;
+    else if (keep) picker.value = keep;
+    return;
+  }
   const want = new URLSearchParams(location.search).get("game");
   const first = want || "transcripts/" + files[0];
   picker.value = first;
@@ -897,6 +928,15 @@ function showEmpty(noServer) {
 
 /* ------------------------------------------------------------ wiring */
 $("picker").addEventListener("change", (ev) => ev.target.value && loadUrl(ev.target.value));
+/* "Deal a new table": a random finished game from the archive, played from the start. */
+$("deal").addEventListener("click", async () => {
+  const opts = [...$("picker").options].map((o) => o.value).filter((v) => v && !/live_/.test(v) && v !== sourceUrl);
+  if (!opts.length) return;
+  const pick = opts[Math.floor(Math.random() * opts.length)];
+  $("picker").value = pick;
+  await loadUrl(pick);
+  setPlaying(true);
+});
 $("file").addEventListener("change", (ev) => readFile(ev.target.files[0]));
 function readFile(f) {
   if (!f) return;
@@ -929,6 +969,7 @@ document.addEventListener("keydown", (ev) => {
   else if (ev.key === "End") { setPlaying(false); go(steps.length - 1); }
   else if (ev.key.toLowerCase() === "s") $("god").click();
   else if (ev.key.toLowerCase() === "n") nextMoment();
+  else if (ev.key.toLowerCase() === "d" && !$("deal").hidden) $("deal").click();
 });
 
 /* Follow live: re-read the current file every 3 s and append new events. */
@@ -947,6 +988,64 @@ setInterval(async () => {
     if (changed) useTranscript(t, sourceUrl, true);
   } catch { /* file mid-write; try again next tick */ }
 }, 3000);
+
+
+/* ------------------------------------------------------------ live table (server.py)
+   When the page is served by server.py, judges with the passcode can start a real game here.
+   On GitHub Pages or plain http.server there is no /api/status, so none of this shows. */
+let TABLE = null, lastRunning = null;
+async function pollTable() {
+  try {
+    const r = await fetch("api/status", { cache: "no-store" });
+    if (!r.ok) throw new Error(r.status);
+    TABLE = await r.json();
+  } catch { TABLE = null; $("tableCtl").hidden = true; return; }
+  const run = TABLE.running;
+  const runKey = run ? run.live_file : null;
+  if (runKey !== lastRunning) { lastRunning = runKey; loadIndex(false); }  // a game started or finished
+  $("tableCtl").hidden = false;
+  const watching = run && sourceUrl === "transcripts/" + run.live_file;
+  $("watchLive").hidden = !run || watching;
+  $("startBtn").hidden = !!run || !TABLE.can_start || TABLE.games_left_today <= 0 || !$("passBox").hidden;
+  let msg = "";
+  if (run) msg = watching ? "" : `A game is being played, started ${new Date(run.started_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}.`;
+  else if (TABLE.last_error) msg = "The last game stopped early. You can start another.";
+  else if (TABLE.can_start && TABLE.games_left_today <= 0) msg = "No more new games today.";
+  else if (TABLE.can_start && TABLE.cooldown_s > 0) msg = `Next game available in ${TABLE.cooldown_s} s.`;
+  if (!$("passBox").hidden && !run) msg = $("tableMsg").dataset.sticky || msg;
+  $("tableMsg").textContent = msg;
+}
+async function startGame() {
+  const pass = $("pass").value;
+  if (!pass) { $("pass").focus(); return; }
+  $("passGo").disabled = true;
+  try {
+    const r = await fetch("api/start", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ passcode: pass }) });
+    const out = await r.json().catch(() => ({}));
+    if (!r.ok) { $("tableMsg").dataset.sticky = out.error || "Could not start a game."; $("tableMsg").textContent = $("tableMsg").dataset.sticky; return; }
+    $("pass").value = ""; $("passBox").hidden = true; delete $("tableMsg").dataset.sticky;
+    $("tableMsg").textContent = "Dealing the cards…";
+    const url = "transcripts/" + out.live_file;
+    for (let i = 0; i < 10; i++) {  // the game thread writes its first live file within a moment
+      try { await fetchJson(url); break; } catch { await new Promise((res) => setTimeout(res, 800)); }
+    }
+    lastRunning = out.live_file;
+    await loadIndex(false);
+    $("picker").value = url;
+    await loadUrl(url);
+    pollTable();
+  } finally { $("passGo").disabled = false; }
+}
+$("startBtn").addEventListener("click", () => { $("startBtn").hidden = true; $("passBox").hidden = false; $("pass").focus(); });
+$("passGo").addEventListener("click", startGame);
+$("pass").addEventListener("keydown", (ev) => { if (ev.key === "Enter") startGame(); if (ev.key === "Escape") { $("passBox").hidden = true; delete $("tableMsg").dataset.sticky; pollTable(); } });
+$("watchLive").addEventListener("click", async () => {
+  if (!TABLE?.running) return;
+  const url = "transcripts/" + TABLE.running.live_file;
+  await loadIndex(false); $("picker").value = url; await loadUrl(url); pollTable();
+});
+pollTable();
+setInterval(pollTable, 5000);
 
 loadIndex();
 </script>
