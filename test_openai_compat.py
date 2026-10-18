@@ -6,7 +6,7 @@ from types import SimpleNamespace
 
 from agent import LLMAgent
 from game import AvalonGame
-from openai_compat import OpenAICompatClient, _parse_arguments
+from openai_compat import OpenAICompatClient, _parse_arguments, extract_json_object
 
 
 def _resp(tool_args=None, content=None, name="propose_team"):
@@ -74,6 +74,27 @@ def test_garbage_falls_back_to_random_legal():
     d = LLMAgent(p, "asi1", "terse", OpenAICompatClient(stub)).decide(g.public_state(), g.private_state(p), g.legal_actions(p))
     assert d.fallback and d.calls == 2
     g.apply(p, d.action)
+
+
+def test_auto_switch_to_json_mode():
+    g, p = _leader_setup()
+    prose = _resp(None, content="Let me think about this carefully... " * 50)
+    good_text = _resp(None, content='<think>hmm {not json}</think> {"private_reasoning": "r", "public_statement": "s", "team": [1, 2]}')
+    stub = StubOpenAI([prose, prose, good_text])
+    client = OpenAICompatClient(stub)
+    agent = LLMAgent(p, "asi1", "terse", client)
+    d1 = agent.decide(g.public_state(), g.private_state(p), g.legal_actions(p))
+    assert d1.fallback and client.mode == "json"           # two tool-less replies -> switch
+    d2 = agent.decide(g.public_state(), g.private_state(p), g.legal_actions(p))
+    assert not d2.fallback and d2.action["team"] == [1, 2]
+    req = stub.requests[2]
+    assert "tools" not in req and "OUTPUT FORMAT" in req["messages"][0]["content"]
+
+
+def test_extract_prefers_object_with_required_keys():
+    text = 'Example: {"a": 1}. Final: {"private_reasoning": "x", "vote": "reject"} done'
+    assert extract_json_object(text, ["private_reasoning", "vote"])["vote"] == "reject"
+    assert extract_json_object("no json here", ["vote"]) is None
 
 
 def test_parse_arguments():
