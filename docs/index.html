@@ -1,0 +1,954 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Avalon Arena</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,600;0,700;1,400;1,500&family=Alegreya+Sans:wght@400;500;700&family=Alegreya+SC:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --hall: #151b26;
+  --hall-2: #1d2534;
+  --hall-3: #273146;
+  --rule: #34405a;
+  --oak: #4a2f1c;
+  --oak-hi: #6b4528;
+  --felt: #24402f;
+  --felt-hi: #2e5240;
+  --parchment: #eadfc4;
+  --parchment-2: #ddcfae;
+  --ink: #2a2118;
+  --gold: #c8a04a;
+  --gold-hi: #e2c06d;
+  --good: #4a7bc0;
+  --evil: #b0383f;
+  --thought: #a79fd2;
+  --text: #e6e1d6;
+  --muted: #98a2b4;
+  --serif: "Alegreya", Georgia, serif;
+  --sans: "Alegreya Sans", system-ui, sans-serif;
+  --sc: "Alegreya SC", "Alegreya", Georgia, serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--hall);
+  color: var(--text);
+  font: 16px/1.5 var(--sans);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100vh;
+}
+button, select, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--gold-hi); outline-offset: 2px; }
+
+/* ------------------------------------------------------------ top bar */
+header {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px;
+  padding: 12px 20px; border-bottom: 1px solid var(--rule); background: var(--hall-2);
+}
+header h1 { font: 700 26px/1 var(--sc); margin: 0; color: var(--gold); letter-spacing: .01em; }
+.tracks { display: flex; gap: 22px; align-items: center; margin-left: auto; flex-wrap: wrap; }
+.track { display: flex; align-items: center; gap: 8px; }
+.track-name { color: var(--muted); font-size: 14px; }
+.quest-pip {
+  width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+  border: 2px solid var(--rule); font: 700 14px/1 var(--sans); font-variant-numeric: lining-nums; color: var(--muted);
+}
+.quest-pip.current-q { border-color: var(--gold); color: var(--gold-hi); }
+.quest-pip.ok { background: var(--good); border-color: var(--good); color: #fff; }
+.quest-pip.fail { background: var(--evil); border-color: var(--evil); color: #fff; }
+.rej-pip { width: 12px; height: 12px; border-radius: 3px; border: 1.5px solid var(--rule); }
+.rej-pip.on { background: var(--gold); border-color: var(--gold); }
+.rej-pip:last-child { border-color: var(--evil); }
+.rej-pip:last-child.on { background: var(--evil); }
+.controls-top { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; min-width: 0; }
+#picker { max-width: 100%; min-width: 0; }
+select, .btn {
+  background: var(--hall-3); border: 1px solid var(--rule); border-radius: 6px; padding: 6px 10px;
+}
+.btn { cursor: pointer; }
+.btn:hover { border-color: var(--muted); }
+.btn.secret[aria-pressed="true"] { background: var(--thought); color: var(--hall); border-color: var(--thought); font-weight: 700; }
+label.check { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 14px; }
+
+/* ------------------------------------------------------------ main layout */
+main {
+  display: grid; min-height: 0;
+  grid-template-columns: minmax(400px, 1.1fr) minmax(0, 1fr) minmax(280px, .8fr);
+  grid-template-areas: "stage now log";
+}
+.stage-col { grid-area: stage; display: flex; align-items: center; justify-content: center; min-height: 0; min-width: 0; border-right: 1px solid var(--rule); padding: 8px; }
+.stage { position: relative; flex: 0 0 auto; width: min(100%, calc(100vh - 150px), 600px); aspect-ratio: 1; }
+.stage svg { width: 100%; height: 100%; display: block; }
+.center {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: 40%; text-align: center; pointer-events: none;
+}
+.center .caption { font: 600 17px/1.25 var(--serif); color: var(--parchment); }
+.center .sub { font-size: 14px; color: #b9c9bb; margin-top: 2px; }
+.cards { display: flex; gap: 6px; justify-content: center; margin-top: 10px; perspective: 600px; }
+.card {
+  width: 30px; height: 44px; border-radius: 4px; position: relative; transform-style: preserve-3d;
+  animation: flip .55s ease-out both;
+}
+.card .face { position: absolute; inset: 0; border-radius: 4px; backface-visibility: hidden; }
+.card .back { background: repeating-linear-gradient(45deg, var(--oak) 0 4px, var(--oak-hi) 4px 8px); border: 1px solid var(--gold); }
+.card .front { transform: rotateY(180deg); display: grid; place-items: center; font: 700 16px var(--serif); color: #fff; border: 1px solid rgba(255,255,255,.5); }
+.card.ok .front { background: var(--good); }
+.card.fail .front { background: var(--evil); }
+@keyframes flip { from { transform: rotateY(0); } to { transform: rotateY(180deg); } }
+
+/* seats (SVG) */
+.seat-ring { fill: var(--hall-3); stroke: #586480; stroke-width: 3; }
+.seat.good .seat-ring { stroke: var(--good); }
+.seat.evil .seat-ring { stroke: var(--evil); }
+.seat.speaking .seat-ring { stroke: var(--gold-hi); stroke-width: 5; filter: url(#glow); }
+.seat-label { font: 700 22px var(--serif); font-variant-numeric: lining-nums; fill: var(--text); text-anchor: middle; dominant-baseline: central; }
+.seat-role { font: 500 15px var(--sans); text-anchor: middle; fill: var(--muted); }
+.seat.good .seat-role { fill: #8fb3e6; }
+.seat.evil .seat-role { fill: #e48990; }
+.team-token { fill: var(--gold); stroke: #7a5f22; stroke-width: 2; }
+.vote-token.approve { fill: var(--parchment); stroke: var(--gold); stroke-width: 2; }
+.vote-token.reject { fill: #20140e; stroke: #8a6a55; stroke-width: 2; }
+.vote-mark { font: 700 16px var(--sans); text-anchor: middle; dominant-baseline: central; }
+.vote-mark.approve { fill: var(--ink); }
+.vote-mark.reject { fill: #d8c3b4; }
+.flag-dot { fill: var(--thought); stroke: var(--hall); stroke-width: 2; }
+.crown { fill: var(--gold); stroke: #7a5f22; stroke-width: 1; }
+.target-ring { fill: none; stroke: var(--evil); stroke-width: 3; stroke-dasharray: 6 5; }
+.tell-bg { fill: none; stroke: rgba(167,159,210,.18); stroke-width: 5; }
+.tell { fill: none; stroke: var(--thought); stroke-width: 5; stroke-linecap: round; transition: stroke-dasharray .5s ease; }
+.meter-key { position: absolute; left: 0; right: 0; bottom: -4px; text-align: center; font-size: 13px; color: #c9c3e6; display: flex; gap: 8px; justify-content: center; align-items: center; }
+.meter-key[hidden] { display: none; }
+.meter-swatch { width: 14px; height: 14px; border-radius: 50%; border: 3px solid var(--thought); flex: none; }
+@media (prefers-reduced-motion: reduce) { .tell { transition: none; } }
+.thinking { font: italic 14px var(--serif); fill: var(--thought); text-anchor: middle; }
+.seat-name { font: 600 16px var(--serif); fill: var(--parchment); text-anchor: middle; }
+.seat-no { font: 700 11px var(--sans); fill: var(--muted); text-anchor: middle; dominant-baseline: central; font-variant-numeric: lining-nums; }
+.crest { vertical-align: -4px; margin-right: 6px; flex: none; }
+.badge circle { stroke: var(--hall); stroke-width: 3; }
+.badge.good circle { fill: var(--good); } .badge.evil circle { fill: var(--evil); }
+.badge path { fill: #fff; }
+.emblem { vertical-align: -3px; margin-right: 4px; }
+.emblem.good path { fill: #8fb3e6; } .emblem.evil path { fill: #e48990; }
+.role-tag { white-space: nowrap; }
+.seatno { font: 500 13px var(--sans); color: var(--muted); }
+.cast { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; margin-top: 4px; }
+.cast-card { border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; background: var(--hall-2); }
+.cast-card.good { border-color: #3b5f93; } .cast-card.evil { border-color: #86323a; }
+.cast-head { display: flex; gap: 10px; align-items: center; margin-bottom: 6px; }
+.cast-head .emblem { margin: 0; flex: none; }
+.emblem-hidden { width: 26px; height: 26px; border-radius: 50%; border: 1.5px dashed var(--muted); display: grid; place-items: center; color: var(--muted); font-weight: 700; flex: none; }
+.cast-name { font: 600 17px var(--serif); color: var(--parchment); }
+.cast-role { font-size: 13px; color: var(--muted); line-height: 1.3; }
+.cast-body { font: 15px/1.45 var(--serif); color: #d6d0c2; }
+.cast-body .quirk { color: var(--muted); font-family: var(--sans); font-size: 14px; }
+
+/* now panel */
+.now { grid-area: now; padding: 18px 20px; overflow: auto; min-height: 0; border-right: 1px solid var(--rule); }
+.now h2 { font: 600 20px/1.3 var(--serif); margin: 0 0 4px; color: var(--parchment); }
+.now .meta { color: var(--muted); font-size: 14px; margin-bottom: 10px; }
+.duo { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.duo.single { grid-template-columns: 1fr; }
+.thinks, .says { border-radius: 8px; padding: 10px 14px; font: 17px/1.5 var(--serif); }
+.thinks { border: 1.5px dashed var(--thought); color: #d7d2ee; font-style: italic; }
+.says { background: var(--parchment); color: var(--ink); box-shadow: inset 0 0 0 1px var(--parchment-2); }
+.duo-head { font: 500 14px var(--sans); margin-bottom: 4px; }
+.thinks .duo-head { color: var(--thought); font-style: normal; }
+.says .duo-head { color: #6f5a3e; }
+.rows { display: grid; gap: 6px; }
+.row { display: grid; grid-template-columns: 9.5em 5.5em 1fr; gap: 10px; align-items: start; padding: 6px 0; border-bottom: 1px solid var(--rule); font-size: 15px; }
+.row:last-child { border-bottom: 0; }
+.row .why { color: #cfcae6; font: italic 15px/1.45 var(--serif); }
+.pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 13px; font-weight: 700; }
+.pill.approve, .pill.success { background: var(--parchment); color: var(--ink); }
+.pill.reject { background: #3a2a22; color: #e3cfc2; }
+.pill.fail { background: var(--evil); color: #fff; }
+.flag { color: var(--thought); font-size: 14px; display: block; margin-top: 2px; }
+.good-t { color: #8fb3e6; } .evil-t { color: #e48990; }
+.empty { color: var(--muted); max-width: 46ch; }
+.empty code { background: var(--hall-3); padding: 1px 6px; border-radius: 4px; color: var(--text); }
+
+/* chronicle */
+.chronicle { grid-area: log; overflow: auto; min-height: 0; padding: 14px 18px 24px; }
+.moments { margin: 0 0 12px; border: 1px solid var(--rule); border-radius: 8px; background: var(--hall-2); }
+.moments summary { cursor: pointer; padding: 8px 12px; font: 600 15px var(--sans); color: var(--gold-hi); }
+.moments .hint { font-weight: 400; color: var(--muted); font-size: 13px; }
+.moment-list { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 12px; }
+.moment { background: var(--hall-3); border: 1px solid var(--rule); color: var(--text); border-radius: 999px; padding: 4px 12px; font: 14px var(--sans); cursor: pointer; }
+.moment:hover { border-color: var(--gold); }
+.chronicle h3 { font: 600 15px var(--sans); color: var(--muted); margin: 14px 0 6px; }
+.chronicle h3:first-child { margin-top: 0; }
+.entry { display: block; width: 100%; text-align: left; background: none; border: 0; border-left: 3px solid transparent; padding: 5px 10px; cursor: pointer; color: var(--text); font-size: 15px; line-height: 1.4; border-radius: 0 4px 4px 0; }
+.entry:hover { background: var(--hall-2); }
+.entry.current { border-left-color: var(--gold); background: var(--hall-2); }
+.entry.future { display: none; }
+.entry .q { font-family: var(--serif); color: #d9cfb7; }
+.entry .f { color: var(--thought); }
+.entry .res-ok { color: #8fb3e6; font-weight: 700; } .entry .res-fail { color: #e48990; font-weight: 700; }
+
+/* transport */
+footer {
+  display: flex; align-items: center; gap: 10px; padding: 10px 20px; border-top: 1px solid var(--rule);
+  background: var(--hall-2); flex-wrap: wrap;
+}
+footer .btn { min-width: 40px; }
+#play { min-width: 76px; font-weight: 700; }
+#scrub { flex: 1; min-width: 160px; accent-color: var(--gold); }
+#stepinfo { color: var(--muted); font-size: 14px; min-width: 7.5em; text-align: right; }
+.banner {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 62%;
+  background: var(--parchment); color: var(--ink); border-radius: 10px; padding: 16px 18px; text-align: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,.55); border: 2px solid var(--gold);
+}
+.banner .w { font: 700 28px/1.1 var(--sc); }
+.banner .w.good { color: #2d5a99; } .banner .w.evil { color: #8f262d; }
+.banner p { margin: 6px 0 0; font: 16px/1.4 var(--serif); }
+.drop-hint { position: fixed; inset: 0; display: none; place-items: center; background: rgba(21,27,38,.85); font: 600 24px var(--serif); color: var(--gold-hi); z-index: 10; border: 3px dashed var(--gold); }
+body.dragging .drop-hint { display: grid; }
+
+@media (max-width: 1250px) {
+  main { grid-template-columns: minmax(0, 1.2fr) minmax(280px, 1fr); grid-template-rows: auto minmax(0, 1fr); grid-template-areas: "stage log" "now log"; }
+  .stage { width: min(100%, calc(55vh), 520px); }
+  .now { border-right: 1px solid var(--rule); border-top: 1px solid var(--rule); }
+  .duo { grid-template-columns: 1fr 1fr; }
+  .duo.single { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+  body { display: block; height: auto; }
+  main { display: block; }
+  .stage-col { border-right: 0; }
+  .stage { width: min(100%, 520px); }
+  .now { border: 0; border-top: 1px solid var(--rule); }
+  .chronicle { border-top: 1px solid var(--rule); max-height: 60vh; }
+  .duo { grid-template-columns: 1fr; }
+  .row { grid-template-columns: 7em 5em 1fr; }
+  .tracks { margin-left: 0; }
+  footer { position: sticky; bottom: 0; z-index: 5; padding: 8px 12px; }
+  #scrub { order: 10; flex-basis: 100%; }
+  .banner { width: 80%; }
+  .banner .w { font-size: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card { animation: none; transform: rotateY(180deg); }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Avalon Arena</h1>
+  <div class="controls-top">
+    <select id="picker" aria-label="Choose a saved game"><option value="">Loading games…</option></select>
+    <label class="btn" for="file">Open file</label>
+    <input id="file" type="file" accept=".json,application/json" hidden>
+    <button class="btn secret" id="god" aria-pressed="false" title="Shortcut: S">Show secrets</button>
+    <label class="check"><input type="checkbox" id="follow"> Follow live</label>
+  </div>
+  <div class="tracks" aria-label="Game progress">
+    <div class="track"><span class="track-name">Quests</span><span id="questTrack" style="display:flex;gap:6px"></span></div>
+    <div class="track"><span class="track-name">Rejected teams</span><span id="rejTrack" style="display:flex;gap:4px"></span></div>
+  </div>
+</header>
+
+<main>
+  <section class="stage-col">
+    <div class="stage" id="stage">
+      <svg viewBox="0 0 640 640" id="board" role="img" aria-label="The round table">
+        <defs>
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <radialGradient id="feltGrad" cx="50%" cy="45%" r="60%">
+            <stop offset="0%" stop-color="var(--felt-hi)"/><stop offset="100%" stop-color="var(--felt)"/>
+          </radialGradient>
+        </defs>
+        <circle cx="320" cy="320" r="168" fill="var(--oak)" stroke="var(--oak-hi)" stroke-width="3"/>
+        <circle cx="320" cy="320" r="146" fill="url(#feltGrad)"/>
+        <g id="layer-tokens"></g>
+        <g id="layer-seats"></g>
+      </svg>
+      <div class="center" id="center"></div>
+      <div id="bannerSlot"></div>
+      <div class="meter-key" id="meterKey" hidden><span class="meter-swatch"></span>Ring fills as a player rejects teams that contain Evil. A full ring is Merlin's tell.</div>
+    </div>
+  </section>
+  <section class="now" id="now" aria-live="polite"></section>
+  <aside class="chronicle" id="chronicle" aria-label="Game log">
+    <details class="moments" id="moments" hidden>
+      <summary>Jump to key moments <span class="hint">(spoilers; N jumps to the next one)</span></summary>
+      <div class="moment-list" id="momentList"></div>
+    </details>
+    <div id="log"></div>
+  </aside>
+</main>
+
+<footer>
+  <button class="btn" id="first" title="Start (Home)" aria-label="Go to start">⏮</button>
+  <button class="btn" id="prev" title="Back (←)" aria-label="Step back">◀</button>
+  <button class="btn" id="play" title="Play or pause (Space)">Play</button>
+  <button class="btn" id="next" title="Forward (→)" aria-label="Step forward">▶</button>
+  <button class="btn" id="last" title="End (End)" aria-label="Go to end">⏭</button>
+  <input type="range" id="scrub" min="0" max="0" value="0" aria-label="Scrub through the game">
+  <select id="voice" aria-label="Voice-over" title="Voice-over (V)">
+    <option value="off">Voice off</option><option value="speech">Voice: speech</option><option value="all">Voice: + thoughts</option>
+  </select>
+  <select id="speed" aria-label="Playback speed">
+    <option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option>
+  </select>
+  <span id="stepinfo"></span>
+</footer>
+<div class="drop-hint">Drop a transcript to watch it</div>
+
+<script>
+"use strict";
+const ROLE = {
+  merlin: { name: "Merlin", team: "good", blurb: "Knows who is Evil, must not be found out",
+    // pointed wizard hat with a star
+    glyph: "M-9 8 H9 L5 4 L1 -10 L-3 -3 L-5 4 Z M5 -9 l1 2 2 .3 -1.5 1.4 .4 2.1 -1.9 -1 -1.9 1 .4 -2.1 -1.5 -1.4 2 -.3 Z" },
+  percival: { name: "Percival", team: "good", blurb: "Sees Merlin and Morgana, but not which is which",
+    // heater shield with a cross
+    glyph: "M0 -10 L8 -7 L7.5 1 Q6 7 0 10 Q-6 7 -7.5 1 L-8 -7 Z M-1 -6 V6 H1 V-6 Z M-5 -2 V0 H5 V-2 Z", evenodd: true },
+  loyal_servant: { name: "Loyal Servant", team: "good", blurb: "Knows nothing, must read the table",
+    // upright sword
+    glyph: "M-1.2 -10 L0 -11.5 L1.2 -10 L1.2 3 H-1.2 Z M-6 3 H6 V5 H-6 Z M-1 5 H1 V9 H-1 Z M-2 9 H2 V11 H-2 Z" },
+  morgana: { name: "Morgana", team: "evil", blurb: "Evil, and looks like Merlin to Percival",
+    // crescent moon
+    glyph: "M3 -9.5 A10 10 0 1 0 3 9.5 A12 12 0 0 1 3 -9.5 Z" },
+  assassin: { name: "Assassin", team: "evil", blurb: "Evil, and gets one shot at Merlin",
+    // dagger, tilted
+    glyph: "M-1 -11 L0 -12.5 L1 -11 L1 2 H-1 Z M-4.5 2 H4.5 V3.6 H-4.5 Z M-.9 3.6 H.9 V8 H-.9 Z M-1.6 8 H1.6 V9.8 H-1.6 Z", rotate: 35 },
+};
+const SIZES = [2, 3, 2, 3, 3];
+const C = 320, R_SEAT = 232, R_TEAM = 118, R_VOTE = 176;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+let T = null, steps = [], idx = 0, god = false, playing = false, timer = null, sourceUrl = null;
+
+/* ------------------------------------------------------------ helpers */
+const roleOf = (p) => T.roles[String(p)];
+const teamOf = (p) => ROLE[roleOf(p)]?.team;
+const seatXY = (p, r) => { const a = (-90 + p * 72) * Math.PI / 180; return [C + r * Math.cos(a), C + r * Math.sin(a)]; };
+const charOf = (p) => T.config?.characters?.[String(p)] || null;
+const who = (p) => charOf(p)?.name || `P${p}`;
+/* ------------------------------------------------------------ heraldry
+   Every character gets an original coat of arms, derived from a hash of their name so Sir Kay always
+   carries the same arms. Tinctures avoid the blue and red that mean Good and Evil elsewhere. */
+const TINCT_COLOR = ["#2f6b3a", "#2b2b33", "#6b3f7a", "#a65a24", "#7a2f45"]; // vert, sable, purpure, tenne, murrey
+const TINCT_METAL = ["#d8b04a", "#e4e1d8"];                                   // or, argent
+const SHIELD = "M-11 -12 H11 V0 Q11 9 0 13 Q-11 9 -11 0 Z";
+let clipSeq = 0;
+function seeded(str) {
+  let h = 2166136261;
+  for (const ch of str) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); }
+  return () => { h = (h + 0x6d2b79f5) | 0; let t = Math.imul(h ^ (h >>> 15), 1 | h); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+function chargeSvg(kind, x, y, k, fill) {
+  if (kind === "mullet") {
+    const pts = [];
+    for (let i = 0; i < 10; i++) { const r = (i % 2 ? 2.1 : 5) * k, a = -Math.PI / 2 + i * Math.PI / 5; pts.push(`${(x + r * Math.cos(a)).toFixed(2)},${(y + r * Math.sin(a)).toFixed(2)}`); }
+    return `<polygon points="${pts.join(" ")}" fill="${fill}"/>`;
+  }
+  if (kind === "roundel") return `<circle cx="${x}" cy="${y}" r="${3.6 * k}" fill="${fill}"/>`;
+  if (kind === "lozenge") return `<path d="M${x} ${y - 5 * k} L${x + 3.6 * k} ${y} L${x} ${y + 5 * k} L${x - 3.6 * k} ${y} Z" fill="${fill}"/>`;
+  return `<circle cx="${x}" cy="${y}" r="${3.4 * k}" fill="none" stroke="${fill}" stroke-width="${1.7 * k}"/>`; // annulet
+}
+function arms(name) {
+  const r = seeded(name), pick = (a) => a[Math.floor(r() * a.length)];
+  const field = pick(TINCT_COLOR), metal = pick(TINCT_METAL);
+  const charge = pick(["mullet", "roundel", "lozenge", "annulet"]);
+  const design = pick(["plain", "pale", "fess", "bend-div", "quarterly", "chevron", "cross", "saltire", "bend", "chief"]);
+  let g = `<rect x="-12" y="-13" width="24" height="27" fill="${field}"/>`;
+  switch (design) {
+    case "plain": g += chargeSvg(charge, 0, 0, 1.45, metal); break;
+    case "pale": g += `<rect x="0" y="-13" width="12" height="27" fill="${metal}"/>`; break;
+    case "fess": g += `<rect x="-12" y="0.5" width="24" height="14" fill="${metal}"/>` + chargeSvg(charge, 0, -6, 0.9, metal); break;
+    case "bend-div": g += `<path d="M-12 -13 L12 14 L-12 14 Z" fill="${metal}"/>`; break;
+    case "quarterly": g += `<rect x="0" y="-13" width="12" height="13.5" fill="${metal}"/><rect x="-12" y="0.5" width="12" height="14" fill="${metal}"/>`; break;
+    case "chevron": g += `<path d="M-13 9 L0 -3 L13 9 L13 14.5 L0 2.5 L-13 14.5 Z" fill="${metal}"/>` + chargeSvg(charge, 0, -8, 0.7, metal); break;
+    case "cross": g += `<rect x="-2.6" y="-13" width="5.2" height="27" fill="${metal}"/><rect x="-12" y="-3.2" width="24" height="5.2" fill="${metal}"/>`; break;
+    case "saltire": g += `<path d="M-12 -13 L12 14 M12 -13 L-12 14" stroke="${metal}" stroke-width="4.4"/>`; break;
+    case "bend": g += `<path d="M-12 -13 L12 14" stroke="${metal}" stroke-width="5.5"/>` + chargeSvg(charge, 5, -6, 0.75, metal); break;
+    default: g += `<rect x="-12" y="-13" width="24" height="7.5" fill="${metal}"/>` + chargeSvg(charge, 0, 3, 1.05, metal); // chief
+  }
+  const id = `cl${++clipSeq}`;
+  return `<defs><clipPath id="${id}"><path d="${SHIELD}"/></clipPath></defs><g clip-path="url(#${id})">${g}</g><path d="${SHIELD}" fill="none" stroke="rgba(226,192,109,.85)" stroke-width="1.1"/>`;
+}
+const crestSvg = (p, size = 20) => charOf(p) ? `<svg class="crest" width="${size}" height="${Math.round(size * 1.12)}" viewBox="-13 -13.5 26 28" aria-hidden="true">${arms(charOf(p).name)}</svg>` : "";
+
+const emblemSvg = (role, size = 18) => {
+  const r = ROLE[role];
+  return `<svg class="emblem ${r.team}" width="${size}" height="${size}" viewBox="-13 -13 26 26" aria-hidden="true"><path d="${r.glyph}" ${r.evenodd ? 'fill-rule="evenodd"' : ""} transform="rotate(${r.rotate || 0})"/></svg>`;
+};
+const roleTag = (p) => `<span class="role-tag ${teamOf(p)}-t">${emblemSvg(roleOf(p))}${ROLE[roleOf(p)].name}</span>`;
+const seatNo = (p) => (charOf(p) ? ` <span class="seatno">P${p}</span>` : "");
+const name = (p, forceRole) => `${crestSvg(p, 20)}${esc(who(p))}${seatNo(p)}${(god || forceRole) ? " " + roleTag(p) : ""}`;
+const plainName = (p) => `${esc(who(p))}${god ? ` (${ROLE[roleOf(p)].name})` : ""}`;
+const listPlayers = (ps) => { const n = ps.map((p) => esc(who(p))); return n.length < 2 ? n.join("") : n.slice(0, -1).join(", ") + " and " + n.at(-1); };
+const short = (s, n) => (s && s.length > n ? s.slice(0, n - 1).trimEnd() + "…" : s || "");
+const persona = (p) => {
+  const c = charOf(p);
+  if (c) return c.temperament;
+  return (T.config?.personalities?.[String(p)] || "").split(";")[0];
+};
+const cap = (t) => (t ? t[0].toUpperCase() + t.slice(1) : "");
+const isAuto = (txt) => !txt || txt.startsWith("(automatic");
+
+/* "said reject, voted approve": compare a player's last statement on this proposal with their vote */
+const REJ = /\b(reject|rejecting|rejected|vote no|voting no|against|block it|nope)\b/i;
+const APP = /\b(approve|approving|approved|yes|support|i'?m in|back (this|it)|on board|let'?s go|go for it)\b/i;
+function intent(text) {
+  if (!text) return null;
+  const r = REJ.test(text), a = APP.test(text);
+  return r && !a ? "reject" : a && !r ? "approve" : null;
+}
+
+/* ------------------------------------------------------------ steps + snapshots */
+function buildSteps(t) {
+  const out = [{ kind: "deal" }];
+  for (const e of t.events) out.push({ kind: e.phase, e });
+  if (t.result) out.push({ kind: "end" });
+
+  const st = { quests: [], rej: 0, leader: null, team: null, quest: 1, attempt: 1, talk: {}, votes: null, cards: null, target: null, flags: {},
+               tell: { 0: [0, 0], 1: [0, 0], 2: [0, 0], 3: [0, 0], 4: [0, 0] } };
+  const evilOn = (team) => team.some((p) => ROLE[t.roles[String(p)]]?.team === "evil");
+  for (const s of out) {
+    const e = s.e;
+    st.speaker = null; st.cards = null;
+    if (s.kind === "propose") {
+      Object.assign(st, { leader: e.actor, team: e.action.team, quest: e.quest, attempt: e.attempt, talk: {}, votes: null, flags: {} });
+      st.talk[e.actor] = e.public_statement; st.speaker = e.actor;
+    } else if (s.kind === "discuss") {
+      st.talk = { ...st.talk, [e.actor]: e.public_statement }; st.speaker = e.actor;
+    } else if (s.kind === "vote") {
+      st.votes = e.votes; st.team = e.team; st.leader = e.leader;
+      st.flags = {};
+      for (const [p, v] of Object.entries(e.votes)) {
+        const said = intent(st.talk[p]);
+        if (said && said !== v) st.flags[p] = said;
+      }
+      s.flags = { ...st.flags };
+      if (evilOn(e.team)) {
+        st.tell = JSON.parse(JSON.stringify(st.tell));
+        for (const [p, v] of Object.entries(e.votes)) { st.tell[p][1] += 1; if (v === "reject") st.tell[p][0] += 1; }
+      }
+      st.rej = e.approved ? 0 : st.rej + 1;
+    } else if (s.kind === "quest") {
+      st.quests = [...st.quests, { ok: e.succeeded, fails: e.fails, team: e.team }];
+      st.cards = e; st.votes = null; st.flags = {};
+    } else if (s.kind === "assassinate") {
+      st.target = e.action.target; st.speaker = e.actor; st.team = null; st.votes = null;
+    }
+    s.snap = JSON.parse(JSON.stringify(st));
+  }
+  return out;
+}
+
+/* ------------------------------------------------------------ rendering */
+function render() {
+  if (!T) return;
+  const s = steps[idx], snap = s.snap;
+  const final = s.kind === "end";
+  renderTracks(snap, s);
+  renderSeats(s, snap, final);
+  renderCenter(s, snap);
+  renderNow(s, snap);
+  renderChronicle();
+  $("meterKey").hidden = !(god && Object.values(snap.tell).some(([, n]) => n > 0));
+  $("scrub").max = steps.length - 1; $("scrub").value = idx;
+  $("stepinfo").textContent = `Step ${idx + 1} of ${steps.length}`;
+  $("play").textContent = playing ? "Pause" : "Play";
+}
+
+function renderTracks(snap, s) {
+  const done = snap.quests.length;
+  $("questTrack").innerHTML = SIZES.map((n, i) => {
+    const q = snap.quests[i];
+    const cls = q ? (q.ok ? "ok" : "fail") : (i === done && s.kind !== "end" ? "current-q" : "");
+    const label = q ? (q.ok ? "✓" : q.fails) : n;
+    const title = q ? (q.ok ? `Quest ${i + 1} succeeded` : `Quest ${i + 1} failed with ${q.fails} fail card${q.fails > 1 ? "s" : ""}`) : `Quest ${i + 1} needs ${n} players`;
+    return `<span class="quest-pip ${cls}" title="${title}">${label}</span>`;
+  }).join("");
+  $("rejTrack").innerHTML = [0, 1, 2, 3, 4].map((i) => `<span class="rej-pip ${i < snap.rej ? "on" : ""}" title="${i === 4 ? "A fifth rejected team means Evil wins" : ""}"></span>`).join("");
+}
+
+function renderSeats(s, snap, final) {
+  const showRoles = god || final;
+  const pending = (T.live && T.pending && idx === steps.length - 1) ? T.pending.map(String) : [];
+  let seats = "", tokens = "";
+  for (let p = 0; p < 5; p++) {
+    const [x, y] = seatXY(p, R_SEAT);
+    const team = showRoles ? teamOf(p) : "";
+    const cls = ["seat", team, snap.speaker === p ? "speaking" : ""].join(" ");
+    seats += `<g class="${cls}"><title>${esc(who(p))} (P${p})${showRoles ? ", " + ROLE[roleOf(p)].name : ""}: ${esc(persona(p))}</title>`;
+    seats += `<circle class="seat-ring" cx="${x}" cy="${y}" r="40"/>`;
+    const above = p === 0, nm = charOf(p)?.name;
+    if (nm) {
+      seats += `<g transform="translate(${x} ${y - 5}) scale(1.75)">${arms(nm)}</g>`;
+      seats += `<text class="seat-no" x="${x}" y="${y + 30}">P${p}</text>`;
+    } else seats += `<text class="seat-label" x="${x}" y="${y}">P${p}</text>`;
+    const y1 = above ? y - (showRoles ? 70 : 52) : y + 60, y2 = y1 + 18;
+    if (nm) seats += `<text class="seat-name" x="${x}" y="${y1}">${esc(nm)}</text>`;
+    if (showRoles) {
+      seats += `<text class="seat-role" x="${x}" y="${nm ? y2 : y1}">${ROLE[roleOf(p)].name}</text>`;
+      const r = ROLE[roleOf(p)];
+      seats += `<g class="badge ${r.team}" transform="translate(${x + 29} ${y + 27})"><circle r="16"/><path d="${r.glyph}" ${r.evenodd ? 'fill-rule="evenodd"' : ""} transform="rotate(${r.rotate || 0}) scale(.95)"/></g>`;
+    }
+    if (snap.leader === p && !final) {
+      const cx = x + (x < C - 1 ? -30 : 30), cy = y - 34;  // crown on the side away from the table
+      seats += `<path class="crown" d="M${cx - 13} ${cy + 7} L${cx - 13} ${cy - 5} L${cx - 6} ${cy + 1} L${cx} ${cy - 9} L${cx + 6} ${cy + 1} L${cx + 13} ${cy - 5} L${cx + 13} ${cy + 7} Z"><title>Leader</title></path>`;
+    }
+    const [tk, tn] = snap.tell[p] || [0, 0];
+    if (god && tn > 0) {
+      const circ = 2 * Math.PI * 47, frac = tk / tn;
+      seats += `<circle class="tell-bg" cx="${x}" cy="${y}" r="47"/>`;
+      seats += `<circle class="tell" cx="${x}" cy="${y}" r="47" stroke-dasharray="${(frac * circ).toFixed(1)} ${circ.toFixed(1)}" transform="rotate(-90 ${x} ${y})"><title>${esc(who(p))} voted to reject ${tk} of ${tn} teams that contained an Evil player</title></circle>`;
+    }
+    if (snap.target === p) seats += `<circle class="target-ring" cx="${x}" cy="${y}" r="55"/>`;
+    if (pending.includes(String(p))) seats += `<text class="thinking" x="${x}" y="${p === 0 ? y + 62 : y - 50}">thinking…</text>`;
+    seats += `</g>`;
+
+    if (snap.team && snap.team.includes(p) && !final) {
+      const [tx, ty] = seatXY(p, R_TEAM);
+      tokens += `<circle class="team-token" cx="${tx}" cy="${ty}" r="13"><title>On the proposed team</title></circle>`;
+    }
+    if (snap.votes && snap.votes[String(p)]) {
+      const v = snap.votes[String(p)];
+      const [vx, vy] = seatXY(p, R_VOTE);
+      tokens += `<circle class="vote-token ${v}" cx="${vx}" cy="${vy}" r="15"><title>P${p} voted ${v}</title></circle>`;
+      tokens += `<text class="vote-mark ${v}" x="${vx}" y="${vy}">${v === "approve" ? "✓" : "✗"}</text>`;
+      if (snap.flags[String(p)]) tokens += `<circle class="flag-dot" cx="${vx + 13}" cy="${vy - 13}" r="6"><title>Said ${snap.flags[String(p)]}, voted ${v}</title></circle>`;
+    }
+  }
+  $("layer-seats").innerHTML = seats;
+  $("layer-tokens").innerHTML = tokens;
+}
+
+function renderCenter(s, snap) {
+  const e = s.e;
+  let html = "";
+  if (s.kind === "deal") html = `<div class="caption">The table is set</div><div class="sub">5 agents, 2 secretly Evil</div>`;
+  else if (s.kind === "propose" || s.kind === "discuss") html = `<div class="caption">Quest ${snap.quest}</div><div class="sub">Proposal ${snap.attempt}, team of ${SIZES[snap.quest - 1]}</div>`;
+  else if (s.kind === "vote") {
+    const yes = Object.values(e.votes).filter((v) => v === "approve").length;
+    html = `<div class="caption">${e.approved ? "Approved" : "Rejected"} ${yes} to ${5 - yes}</div><div class="sub">Quest ${e.quest}, proposal ${e.attempt}</div>`;
+  } else if (s.kind === "quest") {
+    const n = e.team.length, fails = e.fails;
+    const order = Array.from({ length: n }, (_, i) => (i < n - fails ? "ok" : "fail"));
+    html = `<div class="caption">Quest ${e.quest} ${e.succeeded ? "succeeds" : "fails"}</div>`;
+    html += `<div class="cards">${order.map((c, i) => `<div class="card ${c}" style="animation-delay:${i * 0.18}s"><div class="face back"></div><div class="face front">${c === "ok" ? "✓" : "✗"}</div></div>`).join("")}</div>`;
+  } else if (s.kind === "assassinate") html = `<div class="caption">The Assassin strikes</div><div class="sub">Naming P${e.action.target} as Merlin</div>`;
+  $("center").innerHTML = s.kind === "end" ? "" : html;
+
+  if (s.kind === "end") {
+    const r = T.result;
+    const how = {
+      merlin_assassinated: `The Assassin named ${esc(who(r.merlin_guess))}, who was Merlin.`,
+      three_quests_succeeded: `Three quests succeeded and the Assassin named ${esc(who(r.merlin_guess))}. Merlin was ${esc(who(r.merlin_actual))} and survived.`,
+      three_quests_failed: "Three quests failed.",
+      five_rejections: "Five teams in a row were rejected.",
+    }[r.reason] || r.reason;
+    $("bannerSlot").innerHTML = `<div class="banner"><div class="w ${r.winner}">${r.winner === "good" ? "Good wins" : "Evil wins"}</div><p>${how}</p></div>`;
+  } else $("bannerSlot").innerHTML = "";
+}
+
+function duo(thinks, says, who) {
+  const showThinks = god && thinks;
+  const t = showThinks ? `<div class="thinks"><div class="duo-head">${who} thinks</div>${esc(thinks)}</div>` : "";
+  const sy = says ? `<div class="says"><div class="duo-head">${who} says</div>${esc(says)}</div>` : "";
+  return `<div class="duo ${showThinks && says ? "" : "single"}">${t}${sy}</div>`;
+}
+
+function renderNow(s, snap) {
+  const e = s.e;
+  let h = "";
+  if (s.kind === "deal") {
+    h = `<h2>Five agents take their seats</h2><div class="meta">Three serve Arthur and two serve Mordred. Each knows only what their role allows.</div>`;
+    h += `<div class="cast">` + [0, 1, 2, 3, 4].map((p) => castCard(p, god)).join("") + `</div>`;
+    if (!god) h += `<p class="empty">Press Play, or turn on Show secrets to see every role and every private thought.</p>`;
+  } else if (s.kind === "propose") {
+    h = `<h2>${name(e.actor)} proposes ${listPlayers(e.action.team)}</h2><div class="meta">Quest ${e.quest}, proposal ${e.attempt}. ${esc(cap(persona(e.actor)))}.</div>`;
+    h += duo(e.private_reasoning, e.public_statement, `P${e.actor}`);
+  } else if (s.kind === "discuss") {
+    h = `<h2>${name(e.actor)} speaks</h2><div class="meta">On the team of ${listPlayers(snap.team || [])}. ${esc(cap(persona(e.actor)))}.</div>`;
+    h += duo(e.private_reasoning, e.public_statement, `P${e.actor}`);
+  } else if (s.kind === "vote") {
+    const yes = Object.values(e.votes).filter((v) => v === "approve").length;
+    h = `<h2>The vote: ${e.approved ? "approved" : "rejected"} ${yes} to ${5 - yes}</h2><div class="meta">Team of ${listPlayers(e.team)}, proposed by ${esc(who(e.leader))}. Votes are cast together and revealed with names.</div><div class="rows">`;
+    for (let p = 0; p < 5; p++) {
+      const v = e.votes[String(p)], f = s.flags[String(p)];
+      h += `<div class="row"><span>${name(p)}</span><span><span class="pill ${v}">${v}</span></span><span>`;
+      if (f) h += `<span class="flag">Said ${f}, voted ${v}</span>`;
+      if (god) h += `<span class="why">${esc(e.reasoning?.[String(p)])}</span>`;
+      h += `</span></div>`;
+    }
+    h += `</div>`;
+  } else if (s.kind === "quest") {
+    h = `<h2>Quest ${e.quest} ${e.succeeded ? "succeeds" : `fails with ${e.fails} fail card${e.fails > 1 ? "s" : ""}`}</h2>`;
+    h += `<div class="meta">Team of ${listPlayers(e.team)}. Only the number of fail cards is revealed to the table.</div>`;
+    if (god) {
+      h += `<div class="rows">` + e.team.map((p) => {
+        const c = e.cards[String(p)], why = e.reasoning?.[String(p)];
+        return `<div class="row"><span>${name(p)}</span><span><span class="pill ${c}">${c}</span></span><span class="why">${isAuto(why) ? "Good players can only play success." : esc(why)}</span></div>`;
+      }).join("") + `</div>`;
+    }
+  } else if (s.kind === "assassinate") {
+    h = `<h2>${name(e.actor, true)} names ${esc(who(e.action.target))} as Merlin</h2><div class="meta">Good won three quests, so the Assassin gets one guess. A correct guess wins the game for Evil.</div>`;
+    h += duo(e.private_reasoning, e.public_statement, `P${e.actor}`);
+    if (!god) h += `<div class="thinks" style="margin-top:8px"><div class="duo-head">P${e.actor}'s reasoning</div>${esc(e.private_reasoning)}</div>`;
+  } else if (s.kind === "end") {
+    const r = T.result;
+    h = `<h2>${r.winner === "good" ? "Good wins" : "Evil wins"}</h2><div class="meta">Every role, revealed.</div>`;
+    h += `<div class="cast">` + [0, 1, 2, 3, 4].map((p) => castCard(p, true)).join("") + `</div>`;
+    const st = T.stats || {};
+    h += `<p class="meta" style="margin-top:12px">${st.proposals ?? "?"} proposals, ${st.llm_calls ?? "?"} model calls, ${st.parse_failures ?? 0} fallbacks${st.duration_s ? `, ${Math.round(st.duration_s / 60)} minutes` : ""}.</p>`;
+  }
+  $("now").innerHTML = h;
+}
+
+function castCard(p, reveal) {
+  const c = charOf(p), role = roleOf(p), r = ROLE[role];
+  const cls = reveal ? r.team : "";
+  let h = `<div class="cast-card ${cls}">`;
+  const head = c ? crestSvg(p, 34) : (reveal ? emblemSvg(role, 26) : `<span class="emblem-hidden">?</span>`);
+  h += `<div class="cast-head">${head}<div><div class="cast-name">${esc(who(p))}${seatNo(p)}</div>`;
+  h += reveal ? `<div class="cast-role ${r.team}-t">${c ? emblemSvg(role, 15) : ""}${r.name}: ${r.blurb}</div>` : `<div class="cast-role">Role hidden</div>`;
+  h += `</div></div>`;
+  if (c) h += `<div class="cast-body">${esc(cap(c.temperament))}. <span class="quirk">${esc(c.quirk[0].toUpperCase() + c.quirk.slice(1))}. Plays ${esc(c.playstyle)}.</span></div>`;
+  else h += `<div class="cast-body">${esc(cap(persona(p)))}.</div>`;
+  return h + `</div>`;
+}
+
+function chronicleLine(s) {
+  const e = s.e;
+  switch (s.kind) {
+    case "deal": return "Roles dealt";
+    case "propose": return `<span class="q">${plainName(e.actor)}</span> proposes ${listPlayers(e.action.team)}`;
+    case "discuss": return `<span class="q">${plainName(e.actor)}:</span> “${esc(short(e.public_statement, 90))}”`;
+    case "vote": {
+      const yes = Object.values(e.votes).filter((v) => v === "approve").length;
+      const fl = Object.entries(s.flags).map(([p, f]) => `<span class="f">${esc(who(p))} said ${f}, voted ${e.votes[p]}</span>`).join("; ");
+      return `Vote ${e.approved ? "approved" : "rejected"} ${yes} to ${5 - yes}${fl ? ". " + fl : ""}`;
+    }
+    case "quest": return e.succeeded ? `<span class="res-ok">Quest ${e.quest} succeeded</span>` : `<span class="res-fail">Quest ${e.quest} failed</span> (${e.fails} fail)`;
+    case "assassinate": return `The Assassin names ${esc(who(e.action.target))} as Merlin`;
+    case "end": return `<strong>${T.result.winner === "good" ? "Good wins" : "Evil wins"}</strong>`;
+  }
+  return s.kind;
+}
+
+function renderChronicle() {
+  let html = "", lastQ = null;
+  steps.forEach((s, i) => {
+    const q = s.e?.quest;
+    if (q && q !== lastQ && (s.kind === "propose")) { html += `<h3 class="${i > idx ? "entry future" : ""}">Quest ${q}</h3>`; lastQ = q; }
+    if (s.kind === "assassinate" || s.kind === "end") { if (lastQ !== "end") { html += `<h3 class="${i > idx ? "entry future" : ""}">Endgame</h3>`; lastQ = "end"; } }
+    html += `<button class="entry ${i === idx ? "current" : ""} ${i > idx ? "future" : ""}" data-i="${i}">${chronicleLine(s)}</button>`;
+  });
+  $("log").innerHTML = html;
+  const cur = $("log").querySelector(".entry.current");
+  if (cur) cur.scrollIntoView({ block: "nearest" });
+}
+
+
+/* ------------------------------------------------------------ voice-over (browser text-to-speech)
+   Each character gets their own system voice, with pitch and pace from their temperament. Private
+   thoughts (with secrets on) play first in a softer, lower "inner voice"; a narrator calls the votes. */
+const SPEECH = "speechSynthesis" in window ? window.speechSynthesis : null;
+let VOICES = [], speakToken = 0;
+const PROSODY = [  // [keyword in temperament, rate, pitch]
+  ["hot-headed", 1.15, 1.2], ["grizzled", 0.88, 0.75], ["jester", 1.1, 1.3], ["poet", 0.95, 1.1],
+  ["steward", 0.95, 1.0], ["devout", 0.92, 0.95], ["sellsword", 0.97, 0.8], ["healer", 0.9, 1.15],
+  ["scholar", 1.02, 1.0], ["proud noble", 0.93, 0.9], ["weary", 0.85, 0.85], ["charmer", 1.04, 1.1],
+  ["terse", 1.05, 0.9], ["overexplains", 1.08, 1.05], ["aggressively", 1.12, 1.0], ["peacemaker", 0.95, 1.1],
+  ["sarcastic", 0.98, 0.95], ["anxious", 1.15, 1.15], ["analytical", 1.0, 0.9],
+];
+function loadVoices() {
+  if (!SPEECH) return;
+  const all = SPEECH.getVoices().filter((v) => /^en[-_]/i.test(v.lang) || v.lang === "en");
+  const rank = (v) => (/GB|IE|AU|NZ|ZA|IN/i.test(v.lang) ? 0 : 1) + (/novelty|whisper|bells|organ|bubbles|zarvox|trinoids|cellos|bad news|good news|jester|superstar|wobble|boing/i.test(v.name) ? 5 : 0);
+  VOICES = all.sort((a, b) => rank(a) - rank(b));
+}
+if (SPEECH) { loadVoices(); SPEECH.onvoiceschanged = loadVoices; }
+const voiceMode = () => (SPEECH ? $("voice").value : "off");
+function narratorVoice() { return VOICES.find((v) => /daniel|arthur|oliver|en-GB/i.test(v.name + v.lang)) || VOICES[0] || null; }
+let castVoices = { key: null, list: [] };
+function seatVoice(p) {
+  // One distinct voice per seat (when the system has 5+), shuffled per game so casts sound different.
+  const key = (T.game_id || "") + VOICES.length;
+  if (castVoices.key !== key) {
+    const pool = VOICES.filter((v) => v !== narratorVoice());
+    const list = (pool.length >= 5 ? pool : VOICES).slice();
+    const rnd = seeded(key);
+    for (let i = list.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [list[i], list[j]] = [list[j], list[i]]; }
+    castVoices = { key, list };
+  }
+  const list = castVoices.list;
+  return list.length ? list[p % list.length] : null;
+}
+function prosody(p) {
+  const t = (persona(p) || "").toLowerCase();
+  const hit = PROSODY.find(([k]) => t.includes(k));
+  return hit ? { rate: hit[1], pitch: hit[2] } : { rate: 1, pitch: 1 };
+}
+function sentences(text) {
+  return (String(text || "").replace(/[_*]/g, "").match(/[^.!?]+[.!?]+["”’)]*\s*|\S[^.!?]*$/g) || []).map((x) => x.trim()).filter(Boolean);
+}
+function say(text, voice, rate, pitch, volume, token) {
+  return new Promise((resolve) => {
+    if (!SPEECH || token !== speakToken || !text) return resolve();
+    const u = new SpeechSynthesisUtterance(text);
+    if (voice) u.voice = voice;
+    u.rate = Math.max(0.5, Math.min(2, rate)); u.pitch = Math.max(0, Math.min(2, pitch)); u.volume = volume;
+    let done = false;
+    const finish = () => { if (!done) { done = true; resolve(); } };
+    u.onend = finish; u.onerror = finish;
+    setTimeout(finish, 2500 + (text.length / 13) * 1000 / u.rate);  // never let a stuck voice stall playback
+    SPEECH.speak(u);
+  });
+}
+function linesFor(s) {
+  const e = s.e || {}, L = [], N = (t) => L.push({ who: "narrator", text: t });
+  const mind = (p, t) => { if (voiceMode() === "all" && (god || s.kind === "assassinate") && t && !isAuto(t)) L.push({ who: p, text: t, inner: true }); };
+  const out = (p, t) => { if (t) L.push({ who: p, text: t }); };
+  const yes = s.kind === "vote" ? Object.values(e.votes).filter((v) => v === "approve").length : 0;
+  switch (s.kind) {
+    case "deal": N("Five agents take their seats at the round table. Two of them secretly serve Mordred."); break;
+    case "propose": N(`${who(e.actor)} proposes ${e.action.team.map(who).join(" and ")}.`); mind(e.actor, e.private_reasoning); out(e.actor, e.public_statement); break;
+    case "discuss": mind(e.actor, e.private_reasoning); out(e.actor, e.public_statement); break;
+    case "vote":
+      N(`The vote is ${e.approved ? "approved" : "rejected"}, ${yes} to ${5 - yes}.`);
+      for (const [p, f] of Object.entries(s.flags || {})) N(`${who(p)} said ${f}, but voted ${e.votes[p]}.`);
+      break;
+    case "quest": N(e.succeeded ? `Quest ${e.quest} succeeds.` : `Quest ${e.quest} fails, with ${e.fails} fail card${e.fails > 1 ? "s" : ""}.`); break;
+    case "assassinate": N(`Good has won three quests. The Assassin must find Merlin.`); mind(e.actor, e.private_reasoning); N(`The Assassin names ${who(e.action.target)}.`); break;
+    case "end": {
+      const r = T.result;
+      N(r.winner === "good" ? `Good wins. ${who(r.merlin_actual)} was Merlin, and survived.` : r.merlin_guess != null ? `Evil wins. ${who(r.merlin_actual)} was Merlin.` : "Evil wins.");
+      break;
+    }
+  }
+  return L;
+}
+async function speakStep(s, token) {
+  const speed = Number($("speed").value);
+  const pace = Math.min(1.6, Math.max(0.8, Math.sqrt(speed)));
+  for (const line of linesFor(s)) {
+    if (token !== speakToken) return;
+    const narr = line.who === "narrator";
+    const v = narr ? narratorVoice() : seatVoice(line.who);
+    const pr = narr ? { rate: 1, pitch: 0.95 } : prosody(line.who);
+    const rate = pr.rate * pace * (line.inner ? 0.92 : 1), pitch = pr.pitch * (line.inner ? 0.85 : 1), vol = line.inner ? 0.55 : 1;
+    for (const chunk of sentences(line.text)) {
+      if (token !== speakToken) return;
+      await say(chunk, v, rate, pitch, vol, token);
+    }
+  }
+}
+function stopSpeech() { speakToken++; if (SPEECH) SPEECH.cancel(); }
+function speakCurrent() { if (voiceMode() !== "off" && T) { stopSpeech(); speakStep(steps[idx], speakToken); } }
+
+/* ------------------------------------------------------------ playback */
+function dwell(s) {
+  const e = s.e || {};
+  let chars = (e.public_statement || "").length;
+  if (god) chars += (e.private_reasoning || "").length * 0.6;
+  if (s.kind === "vote") chars = god ? 500 : 120;
+  if (s.kind === "quest") chars = god ? 300 : 120;
+  if (s.kind === "end") chars = 200;
+  return Math.min(1400 + chars * 32, 12000) / Number($("speed").value);
+}
+function go(i) { idx = Math.max(0, Math.min(steps.length - 1, i)); render(); }
+function tick() {
+  clearTimeout(timer);
+  if (!playing) return;
+  const atEnd = idx >= steps.length - 1;
+  const advance = () => {
+    if (!playing) return;
+    if (atEnd) { if (!$("follow").checked) { playing = false; render(); } else timer = setTimeout(tick, 1500); return; }
+    go(idx + 1); tick();
+  };
+  if (voiceMode() !== "off") {
+    // With voice on, each step lasts exactly as long as its lines take to say.
+    stopSpeech();
+    const token = speakToken;
+    speakStep(steps[idx], token).then(() => { if (token === speakToken && playing) timer = setTimeout(advance, 350 / Number($("speed").value)); });
+  } else if (atEnd) advance();
+  else timer = setTimeout(advance, dwell(steps[idx]));
+}
+function setPlaying(v) { playing = v; if (!v) stopSpeech(); render(); tick(); }
+
+/* ------------------------------------------------------------ loading */
+let moments = [];
+/* Failed quests, broken words and the assassination: the beats worth jumping to in a demo. */
+function buildMoments() {
+  moments = [];
+  steps.forEach((s, i) => {
+    if (s.kind === "quest" && !s.e.succeeded) moments.push({ i, text: `Quest ${s.e.quest} fails` });
+    if (s.kind === "vote" && Object.keys(s.flags).length)
+      moments.push({ i, text: `${Object.keys(s.flags).map((p) => who(p)).join(" and ")} ${Object.keys(s.flags).length > 1 ? "break their word" : "breaks their word"}` });
+    if (s.kind === "assassinate") moments.push({ i, text: "The assassination" });
+  });
+  $("moments").hidden = !moments.length;
+  $("momentList").innerHTML = moments.map((m) => `<button class="moment" data-i="${m.i}">${esc(m.text)}</button>`).join("");
+}
+function nextMoment() {
+  const m = moments.find((x) => x.i > idx) || moments[0];
+  if (m) { setPlaying(false); go(m.i); speakCurrent(); }
+}
+
+function useTranscript(t, url, keepPosition) {
+  if (!keepPosition) stopSpeech();
+  const wasAtEnd = steps.length && idx === steps.length - 1;
+  T = t; sourceUrl = url;
+  steps = buildSteps(t);
+  buildMoments();
+  if (!keepPosition) idx = 0;
+  else if (wasAtEnd && !playing) idx = steps.length - 1;
+  idx = Math.min(idx, steps.length - 1);
+  render();
+}
+async function fetchJson(url) {
+  const r = await fetch(url + (url.includes("?") ? "&" : "?") + "t=" + Date.now(), { cache: "no-store" });
+  if (!r.ok) throw new Error(`${r.status} for ${url}`);
+  return r.json();
+}
+const isLiveUrl = (u) => /\/live_[^/]*\.json$/.test(u || "");
+async function loadUrl(url) {
+  try {
+    const t = await fetchJson(url);
+    useTranscript(t, url, false);
+    if (isLiveUrl(url)) { $("follow").checked = true; go(steps.length - 1); setPlaying(true); }
+    else setPlaying(false);
+  } catch (err) { showError(`Could not load ${url}: ${err.message}`); }
+}
+let TITLES = {}, STATIC_SITE = false;
+/* Published site: transcripts/index.json lists featured games. Local server: parse the directory listing. */
+async function listTranscripts() {
+  try {
+    const r = await fetch("transcripts/index.json", { cache: "no-store" });
+    if (r.ok) {
+      const idx = await r.json();
+      STATIC_SITE = true;
+      TITLES = Object.fromEntries(idx.games.map((g) => [g.file, g.title]));
+      return idx.games.map((g) => g.file);
+    }
+  } catch { /* fall through to directory listing */ }
+  const html = await (await fetch("transcripts/", { cache: "no-store" })).text();
+  return [...new Set([...html.matchAll(/href="([^"?#]+\.json)"/g)].map((m) => decodeURIComponent(m[1]).split("/").pop()))]
+    .filter((f) => !f.startsWith("fake_") && f !== "index.json");
+}
+/* A finished live game's file is removed; find its final transcript by game id. */
+async function finalFileFor(gameId) {
+  const files = await listTranscripts();
+  const hit = files.find((f) => f.endsWith(`_${gameId.slice(0, 8)}.json`));
+  return hit ? "transcripts/" + hit : null;
+}
+function showError(msg) { $("now").innerHTML = `<p class="empty">${esc(msg)}</p>`; }
+
+function label(f, t) {
+  const m = f.match(/(\d{4})(\d{2})(\d{2})-(\d{2})(\d{2})/);
+  let when = f;
+  if (m) {
+    const d = new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]);
+    when = d.toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  }
+  if (f.startsWith("live_")) {
+    const started = t?.created_at ? new Date(t.created_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) : "";
+    return `Live game${started ? ", started " + started : ""} (${t?.events?.length ?? 0} moves so far)`;
+  }
+  if (!t?.result) return `${when}, in progress`;
+  const why = { merlin_assassinated: "Merlin assassinated", three_quests_succeeded: "Merlin survived", three_quests_failed: "3 quests failed", five_rejections: "5 rejections" }[t.result.reason] || t.result.reason;
+  return `${when}: ${t.result.winner === "good" ? "Good" : "Evil"} wins, ${why}`;
+}
+
+async function loadIndex() {
+  const picker = $("picker");
+  let files = [];
+  try {
+    files = await listTranscripts();
+    if (!STATIC_SITE) {
+      files = files.sort().reverse();
+      files = [...files.filter((f) => f.startsWith("live_")), ...files.filter((f) => !f.startsWith("live_"))];
+    } else {
+      $("follow").closest("label").hidden = true;  // nothing is live on the published site
+    }
+  } catch {
+    picker.innerHTML = `<option value="">No saved games found</option>`;
+    showEmpty(true);
+    return;
+  }
+  if (!files.length) { picker.innerHTML = `<option value="">No saved games yet</option>`; showEmpty(false); return; }
+  const metas = await Promise.all(files.map((f) => fetchJson("transcripts/" + f).catch(() => null)));
+  picker.innerHTML = files.map((f, i) => `<option value="transcripts/${esc(f)}">${esc(TITLES[f] || label(f, metas[i]))}</option>`).join("");
+  const want = new URLSearchParams(location.search).get("game");
+  const first = want || "transcripts/" + files[0];
+  picker.value = first;
+  loadUrl(first);
+}
+function showEmpty(noServer) {
+  $("now").innerHTML = noServer
+    ? `<h2>Open a game to watch</h2><p class="empty">To browse saved games, start a local server in the avalon folder with <code>python -m http.server</code> and visit <code>localhost:8000/viewer.html</code>. You can also drop a transcript file onto this page, or use Open file.</p>`
+    : `<h2>No saved games yet</h2><p class="empty">Run <code>python run.py</code> to play a game. It appears here when it finishes, or right away with Follow live.</p>`;
+}
+
+/* ------------------------------------------------------------ wiring */
+$("picker").addEventListener("change", (ev) => ev.target.value && loadUrl(ev.target.value));
+$("file").addEventListener("change", (ev) => readFile(ev.target.files[0]));
+function readFile(f) {
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => { try { useTranscript(JSON.parse(r.result), null, false); setPlaying(false); } catch (err) { showError("That file is not a valid transcript: " + err.message); } };
+  r.readAsText(f);
+}
+document.addEventListener("dragover", (ev) => { ev.preventDefault(); document.body.classList.add("dragging"); });
+document.addEventListener("dragleave", (ev) => { if (!ev.relatedTarget) document.body.classList.remove("dragging"); });
+document.addEventListener("drop", (ev) => { ev.preventDefault(); document.body.classList.remove("dragging"); readFile(ev.dataTransfer.files[0]); });
+
+$("god").addEventListener("click", () => { god = !god; $("god").setAttribute("aria-pressed", god); $("god").textContent = god ? "Hide secrets" : "Show secrets"; render(); });
+$("play").addEventListener("click", () => setPlaying(!playing));
+$("prev").addEventListener("click", () => { setPlaying(false); go(idx - 1); speakCurrent(); });
+$("next").addEventListener("click", () => { setPlaying(false); go(idx + 1); speakCurrent(); });
+$("first").addEventListener("click", () => { setPlaying(false); go(0); });
+$("last").addEventListener("click", () => { setPlaying(false); go(steps.length - 1); });
+$("scrub").addEventListener("input", (ev) => { setPlaying(false); go(+ev.target.value); });
+$("speed").addEventListener("change", tick);
+$("voice").addEventListener("change", () => { stopSpeech(); if (playing) tick(); });
+if (!SPEECH) { $("voice").disabled = true; $("voice").title = "This browser has no text-to-speech"; }
+$("chronicle").addEventListener("click", (ev) => { const b = ev.target.closest(".entry, .moment"); if (b) { setPlaying(false); go(+b.dataset.i); speakCurrent(); } });
+document.addEventListener("keydown", (ev) => {
+  if (ev.target.matches("input, select, textarea")) return;
+  if (ev.key === " ") { ev.preventDefault(); setPlaying(!playing); }
+  else if (ev.key === "ArrowRight") { setPlaying(false); go(idx + 1); speakCurrent(); }
+  else if (ev.key === "ArrowLeft") { setPlaying(false); go(idx - 1); speakCurrent(); }
+  else if (ev.key.toLowerCase() === "v") { const sel = $("voice"); sel.selectedIndex = (sel.selectedIndex + 1) % sel.options.length; sel.dispatchEvent(new Event("change")); }
+  else if (ev.key === "Home") { setPlaying(false); go(0); }
+  else if (ev.key === "End") { setPlaying(false); go(steps.length - 1); }
+  else if (ev.key.toLowerCase() === "s") $("god").click();
+  else if (ev.key.toLowerCase() === "n") nextMoment();
+});
+
+/* Follow live: re-read the current file every 3 s and append new events. */
+setInterval(async () => {
+  if (!$("follow").checked || !sourceUrl) return;
+  try {
+    let t;
+    try { t = await fetchJson(sourceUrl); }
+    catch (err) {
+      if (!isLiveUrl(sourceUrl) || !T?.game_id) throw err;
+      const fin = await finalFileFor(T.game_id);   // live game finished; switch to its saved file
+      if (!fin) throw err;
+      sourceUrl = fin; t = await fetchJson(fin);
+    }
+    const changed = t.events.length !== T.events.length || !!t.result !== !!T.result || JSON.stringify(t.pending) !== JSON.stringify(T.pending);
+    if (changed) useTranscript(t, sourceUrl, true);
+  } catch { /* file mid-write; try again next tick */ }
+}, 3000);
+
+loadIndex();
+</script>
+</body>
+</html>

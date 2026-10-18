@@ -49,6 +49,20 @@ roles and every private thought next to what was said out loud. Space plays/paus
 during each game (disable with `--no-live`). Purple dots and "said X, voted Y" notes mark players whose vote
 contradicted what they said. You can also drag a transcript file onto the page without the server.
 
+## Publish the viewer (GitHub Pages)
+
+```bash
+python build_site.py     # copies viewer + the FEATURED games into docs/
+git add docs && git commit -m "Update site" && git push
+```
+
+On GitHub: **Settings → Pages → Build and deployment → Source: Deploy from a branch → Branch: main, folder: /docs → Save**.
+Edit `FEATURED` in `build_site.py` to change which games are on the site.
+
+Viewer extras: crests per character, the violet "Assassin's view" ring (share of Evil-containing teams each player
+rejected; secrets mode), **Jump to key moments** (N), and **voice-over** (V): each character gets a system voice with
+pitch and pace from their temperament; "+ thoughts" also reads private reasoning in a softer inner voice.
+
 ## Results
 
 ```bash
