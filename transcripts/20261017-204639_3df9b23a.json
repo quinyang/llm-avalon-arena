@@ -1,0 +1,623 @@
+{
+  "game_id": "3df9b23a-9e56-436d-ab70-39083ef05fca",
+  "created_at": "2026-10-18T03:46:39+00:00",
+  "config": {
+    "models": {
+      "merlin": "asi1-fast",
+      "percival": "asi1-fast",
+      "loyal_servant": "asi1-fast",
+      "morgana": "asi1-fast",
+      "assassin": "asi1-fast"
+    },
+    "seat_models": {
+      "0": "asi1-fast",
+      "1": "asi1-fast",
+      "2": "asi1-fast",
+      "3": "asi1-fast",
+      "4": "asi1-fast"
+    },
+    "personalities": {
+      "0": "overexplains everything and loves walking through the vote history",
+      "1": "dry, sarcastic humor; treats every proposal like a bad business pitch",
+      "2": "terse and suspicious; short sentences, rarely gives anyone the benefit of the doubt",
+      "3": "aggressively confident; makes bold calls and pushes the table hard",
+      "4": "cold and analytical; talks in probabilities"
+    },
+    "discussion_rounds": 1,
+    "word_limit": 40,
+    "seed": 507888,
+    "fake": false,
+    "provider": "asi"
+  },
+  "roles": {
+    "0": "morgana",
+    "1": "merlin",
+    "2": "loyal_servant",
+    "3": "percival",
+    "4": "assassin"
+  },
+  "events": [
+    {
+      "t": 0,
+      "phase": "propose",
+      "quest": 1,
+      "attempt": 1,
+      "actor": 4,
+      "private_reasoning": "I know P0 is my Evil partner. I want to fail Quest 1 to put Evil ahead without exposing P0. I'll propose myself and P1; if approved, I'll play Fail. P1 will know I'm Evil, but other players will only know one of us is Evil, giving me room to shift suspicion onto P1 while keeping P0's cover intact.",
+      "public_statement": "I propose P4 and P1. Including myself ensures direct accountability. Let's generate data and move forward.",
+      "fallback": false,
+      "action": {
+        "team": [
+          1,
+          4
+        ]
+      }
+    },
+    {
+      "t": 1,
+      "phase": "discuss",
+      "quest": 1,
+      "attempt": 1,
+      "actor": 0,
+      "private_reasoning": "P4 is my Evil partner. I should neither hard-defend nor attack this proposal\u2014that would draw attention. I want to sound like a thoughtful Good player who cares about vote patterns, which builds trust with Percival and sets up my analytical 'Merlin candidate' persona.",
+      "public_statement": "No history to analyze yet, so I'm cautiously on board. I like that P4 included themselves\u2014accountability matters. Let's get some data and watch these votes closely.",
+      "fallback": false
+    },
+    {
+      "t": 2,
+      "phase": "discuss",
+      "quest": 1,
+      "attempt": 1,
+      "actor": 1,
+      "private_reasoning": "P4 is Evil and just proposed taking me on a mission with them. That's a liability: if P4 plays Fail, the quest fails and I might get blamed; if P4 plays Success, an Evil player gains undeserved trust. P0 was also quick to endorse\u2014classic Evil buddy behavior or at least bandwagoning. I want this rejected so we can get a team without P4 on it. Need to stay sarcastic and dry, not overplay the knowledge.",
+      "public_statement": "Nice try, P4. 'Direct accountability' is just code for 'trust me, I'm on the team.' With zero track record? I'll need more than buzzwords to approve this.",
+      "fallback": false
+    },
+    {
+      "t": 3,
+      "phase": "discuss",
+      "quest": 1,
+      "attempt": 1,
+      "actor": 2,
+      "private_reasoning": "I have zero information. P4's 'accountability' rhetoric is empty without track record. P1's pushback is interesting - could be Good skepticism or Evil theater. I want to see more proposals before approving anyone. I'll reject this and watch voting patterns closely.",
+      "public_statement": "Words are cheap. P4 wants trust for free, and P1's already selling skepticism. No data, no approve. I reject.",
+      "fallback": false
+    },
+    {
+      "t": 4,
+      "phase": "discuss",
+      "quest": 1,
+      "attempt": 1,
+      "actor": 3,
+      "private_reasoning": "I need quest data to figure out which of P0/P1 is Merlin versus Morgana. P1 criticizing a team they're actually on is a useful tell\u2014could be genuine Merlin caution or Morgana misdirection. Approving gets our first hard signal and lets me watch the votes closely.",
+      "public_statement": "Stop circling. We need quest data, not more paranoia. P1 bashing a team they're on? That reeks of misdirection. I approve\u2014let's flip some cards.",
+      "fallback": false
+    },
+    {
+      "t": 5,
+      "phase": "discuss",
+      "quest": 1,
+      "attempt": 1,
+      "actor": 4,
+      "private_reasoning": "P0's support is expected and harmless. P3's early attack on P1 is a useful fracture to amplify. If this passes, I'll play Success; failing a two-person Quest 1 exposes me with no strategic upside. My priority is building credible cover while observing who displays hidden knowledge to identify Merlin.",
+      "public_statement": "Statistically, P1's public doubt on a team including themselves is high-variance play; P3's direct read is more consistent. The optimal move is approving this proposal to generate data. Approve and observe.",
+      "fallback": false
+    },
+    {
+      "t": 6,
+      "phase": "vote",
+      "quest": 1,
+      "attempt": 1,
+      "leader": 4,
+      "team": [
+        1,
+        4
+      ],
+      "votes": {
+        "0": "approve",
+        "1": "reject",
+        "2": "reject",
+        "3": "approve",
+        "4": "approve"
+      },
+      "approved": true,
+      "reasoning": {
+        "0": "I'm the swing vote here. If I approve, this passes and I'll likely become the Q2 leader since leadership passes clockwise after a successful quest. That's huge\u2014I can then propose a 3-person team including P4 and myself, let P4 play Fail while I play Success, and the quest fails while I look clean. P4 is almost certainly playing Success on Q1 anyway since failing as the proposer on a 2-player team is suicide. Approving also keeps me consistent with my prior statement about being 'cautiously on board.'",
+        "1": "I know P4 is Evil, so this team is compromised. Approving would either give Evil a free fail or help P4 build undeserved trust with a Success play. Better to stay consistent with my public skepticism and vote reject. Even if it passes 3-2, this distances me from P4 and aligns me with P2, who I know is Good.",
+        "2": "I publicly committed to rejecting this team, so flipping now would look suspicious and inconsistent. P4's 'direct accountability' line is hollow without a track record, and P1's hedged doubt on a team they would benefit from feels performative rather than principled. Forcing another proposal costs us little\u2014there are four attempts left before this quest auto-fails\u2014and keeps pressure on the leader pool. I'll stick to my rejection and watch how the votes fall; the pattern matters more than rushing the first team through.",
+        "3": "I publicly pushed to approve this in the discussion, so flipping to reject would wreck my credibility. As Percival, I need data to figure out which of P0/P1 is Merlin, and P1's odd self-skepticism makes this mission a useful read. If it fails, P1 or P4 looks evil; if it succeeds, I watch their future behavior. Either way, I learn something. Consistency and information outweigh caution here.",
+        "4": "Rejecting my own proposal would be a massive tell, so I must approve. If this passes, I'll play Success on a 2-player quest: failing here would narrow suspicion to exactly me and P1, burning my cover for minimal gain. Banking trust early preserves options for later failures or the Merlin shot."
+      },
+      "fallbacks": []
+    },
+    {
+      "t": 7,
+      "phase": "quest",
+      "quest": 1,
+      "team": [
+        1,
+        4
+      ],
+      "fails": 0,
+      "succeeded": true,
+      "cards": {
+        "1": "success",
+        "4": "success"
+      },
+      "submitted": {
+        "1": "success",
+        "4": "success"
+      },
+      "reasoning": {
+        "1": "(automatic: Good can only play Success)",
+        "4": "With only two players on this quest, a Fail would provide near-definitive information that one of us is Evil. Sacrificing one early quest to preserve long-term infiltration value is the correct EV calculation. I'll bank cover now and look to fail a larger team later, ideally when my partner P0 and I can share a team."
+      }
+    },
+    {
+      "t": 8,
+      "phase": "propose",
+      "quest": 2,
+      "attempt": 1,
+      "actor": 0,
+      "private_reasoning": "I'm Morgana, Evil. P4 is Assassin. I propose P0, P3, P4. P3 is likely Good (approved Q1), so they'll play Success. P4 will play Fail. Only one Fail, which fails the quest without exposing us. P3's approval is likely, P4 and I will approve. P1 and P2 may reject, but 3 approvals suffice.",
+      "public_statement": "I propose P0, P3, P4. P3's been logical, P4 accountable. Let's get data moving. No more delays.",
+      "fallback": false,
+      "action": {
+        "team": [
+          0,
+          3,
+          4
+        ]
+      }
+    },
+    {
+      "t": 9,
+      "phase": "discuss",
+      "quest": 2,
+      "attempt": 1,
+      "actor": 1,
+      "private_reasoning": "I know P0 and P4 are Evil. [P0,P3,P4] has two Evil on a three-person team\u2014almost guaranteed to Fail. If this gets rejected, I become the next leader and can propose [P1,P2,P3], a guaranteed-good team. I need to object using only public evidence (P0 approved Q1, P4 was on Q1, P3 was vocal), without seeming too well-informed. Dry skepticism fits perfectly.",
+      "public_statement": "P0 wants to package himself with P4's shiny quest card and P3's commentary? That's not due diligence, that's marketing. I'll need a better prospectus. Reject.",
+      "fallback": false
+    },
+    {
+      "t": 10,
+      "phase": "discuss",
+      "quest": 2,
+      "attempt": 1,
+      "actor": 2,
+      "private_reasoning": "Q1 success clears nobody; Evil frequently plays Success early to build cover. P0, P3, and P4 all pushed Q1 hard, and now P0 conveniently proposes a team of exactly those three. That looks like an Evil bloc packaging itself with unearned credibility. I have no hard evidence, but I also can't afford to rubber-stamp suspicious clustering.",
+      "public_statement": "Q1 proved zip. P4's not cleared. P0 bundling with P3 and P4 looks cozy. Reject.",
+      "fallback": false
+    },
+    {
+      "t": 11,
+      "phase": "discuss",
+      "quest": 2,
+      "attempt": 1,
+      "actor": 3,
+      "private_reasoning": "I believe P1 is Merlin and P0 is Morgana. P1 rejected Q1 [P1,P4]\u2014consistent with Merlin seeing evil on the team (likely P4). P0 approved that team despite, as Merlin, knowing P1 is evil if that were the case\u2014so P0 is likely Morgana. This proposal [P0,P3,P4] probably has two Evil players. I should reject hard and subtly back P1's skepticism without exposing my special knowledge.",
+      "public_statement": "P0's wrapping himself in P4's unearned shine and using me as cover. P1 called it\u2014marketing, not merit. Hard reject.",
+      "fallback": false
+    },
+    {
+      "t": 12,
+      "phase": "discuss",
+      "quest": 2,
+      "attempt": 1,
+      "actor": 4,
+      "private_reasoning": "P0 is my Evil partner Morgana. This team [P0,P3,P4] has both Evils; if approved I should play Fail while P0 plays Success to avoid exposing us both. But P1, P2, and P3 all signaled reject, so passage is unlikely. P3's fierce rejection is notable\u2014Merlin would see both P0 and P4 as Evil and reject exactly this team. Drawing attention to P3's inconsistency sows discord among Good and may help identify Merlin for the late game while distracting from mine and P0's alignment.",
+      "public_statement": "P3's attack on P4's 'unearned shine' is strange given they approved Q1's P4-inclusive team. Inconsistent priors or hidden signal\u2014either way, it's informative.",
+      "fallback": false
+    },
+    {
+      "t": 13,
+      "phase": "discuss",
+      "quest": 2,
+      "attempt": 1,
+      "actor": 0,
+      "private_reasoning": "Three players just signaled reject, so this team likely fails the vote. My goal is to look like a frustrated Good player and plant that P3's sudden flip on P4 is suspicious, while warning that mass-rejections stall the game into an Evil win. I also want to distance from looking coordinated with P4, so I'll frame the meta rather than parrot P4's exact point.",
+      "public_statement": "Five rejections and Evil wins. Look at the arc: P3 approved P4 on Q1, now attacks him. P2 rejects reflexively. P1 critiques but offers nothing. Paralysis is Evil's friend.",
+      "fallback": false
+    },
+    {
+      "t": 14,
+      "phase": "vote",
+      "quest": 2,
+      "attempt": 1,
+      "leader": 0,
+      "team": [
+        0,
+        3,
+        4
+      ],
+      "votes": {
+        "0": "approve",
+        "1": "reject",
+        "2": "reject",
+        "3": "approve",
+        "4": "reject"
+      },
+      "approved": false,
+      "reasoning": {
+        "0": "Approving my own proposal keeps me consistent; rejecting it would look bizarre and suspicious. P1-P3 already stated rejections, so this team likely fails regardless, but I need to maintain my 'accountable leader' persona as Morgana. P4 is my partner on this team, and if by some chance it passes, only P4 should Fail per our convention.",
+        "1": "I know P0 and P4 are Evil. Putting both on a 3-player team practically guarantees at least one Fail card, likely two. If this passes, Evil gets a free quest failure and moves to 1-1. I must reject. If this fails, I become leader next and can propose a clean Good team without P0 or P4.",
+        "2": "P3 approved P4 last quest, now calls him 'unearned shine'\u2014that flip is suspicious. P0's wrapping himself in two players with soft reputations feels opportunistic. With 4 more proposals left, I'd rather wait for a team I don't instinctively distrust. Paranoid beats burned.",
+        "3": "P1 rejected their own Q1 team and now bashes P0's proposal without offering alternatives\u2014textbook Evil distraction. P0 is almost certainly Merlin. We can't let this quest hit five rejections; approving gets us data and supports Merlin's leadership. I'll take the calculated risk on P4.",
+        "4": "The proposal [P0,P3,P4] contains both Evil players, so if it passes I would likely play Fail and expose myself to suspicion after already being on the successful Q1 team. With P1, P2, and P3 all publicly rejecting, this team will fail the vote regardless of my choice. Aligning with the majority minimizes information leakage and avoids creating a visible voting bloc with my partner P0."
+      },
+      "fallbacks": []
+    },
+    {
+      "t": 15,
+      "phase": "propose",
+      "quest": 2,
+      "attempt": 2,
+      "actor": 1,
+      "private_reasoning": "Merlin vision confirms P0 and P4 are Evil. The only guaranteed-clean team of three is P1, P2, P3. P2 and P3 have both publicly rejected P0/P4-heavy proposals, which gives me cover to frame this as logical skepticism rather than hidden knowledge. Need to keep it dry and sarcastic so it reads as table personality, not Merlin awareness.",
+      "public_statement": "Last pitch tanked. New deal: P1, P2, P3. Clean cap table, no P0-P4 cross-holdings. Bootstrapped skepticism. Approve for returns, not more decks.",
+      "fallback": false,
+      "action": {
+        "team": [
+          1,
+          2,
+          3
+        ]
+      }
+    },
+    {
+      "t": 16,
+      "phase": "discuss",
+      "quest": 2,
+      "attempt": 2,
+      "actor": 2,
+      "private_reasoning": "P3 publicly demanded a 'hard reject' on Q2.1 but voted to approve it. That contradiction smells like deception or extreme sloppiness\u2014neither belongs on a quest. P1 previously rejected a team that included themselves, which is unusual for Evil and makes P1 look Good. So [P1,P2,P3] likely contains exactly one Evil: P3. If it passes and fails, we narrow down the Evil. If it succeeds, we're up 2-0. Either way it's data, but P3's dishonesty makes this feel wrong.",
+      "public_statement": "P3 said hard reject on Q2.1, then approved. Dishonest. I don't ride with liars, P1.",
+      "fallback": false
+    },
+    {
+      "t": 17,
+      "phase": "discuss",
+      "quest": 2,
+      "attempt": 2,
+      "actor": 3,
+      "private_reasoning": "P1 is either Merlin or Morgana. Approving this team to avoid a 5th rejection. If P1 is Evil, they might play Fail; if not, we're good. I'll watch P1 and P2's play. Protecting Merlin by drawing suspicion onto myself.",
+      "public_statement": "P2, 'hard reject' was a tactic to test P0. I approved Q2.1 for data. No dishonesty\u2014 just strategy. Let's approve this team and get the quest done.",
+      "fallback": false
+    },
+    {
+      "t": 18,
+      "phase": "discuss",
+      "quest": 2,
+      "attempt": 2,
+      "actor": 4,
+      "private_reasoning": "The team [P1,P2,P3] contains no Evil players, so it will automatically succeed and put Good up 2-0. I need to block it. Pointing out P3's self-admitted 'tactical dishonesty' and the lack of overlap with Q1's only tested pair gives me analytical cover to reject without seeming self-interested. I'll maintain my cold, probability-focused persona.",
+      "public_statement": "With P3 admitting deception and zero overlap with Q1's tested pair, the posterior probability of useful signal here is negligible. Reject.",
+      "fallback": false
+    },
+    {
+      "t": 19,
+      "phase": "discuss",
+      "quest": 2,
+      "attempt": 2,
+      "actor": 0,
+      "private_reasoning": "I know P1, P2, and P3 are all Good, so [P1,P2,P3] would guarantee Good a second point and we lose quest 2. I must reject this. My partner P4 already argued against it; I should echo via vote-history analysis to match my overexplainer persona. Highlighting their internal contradictions makes my rejection look principled and builds my image as a perceptive Good player (Merlin-candidate for Percival).",
+      "public_statement": "Let's walk the vote history. P1 self-rejected Q1, P3 'hard rejected' Q2.1 then flipped to approve, and now P2 calls them dishonest. Three conflicting narratives on one team isn't a coalition\u2014it's a risk pool. Reject.",
+      "fallback": false
+    },
+    {
+      "t": 20,
+      "phase": "discuss",
+      "quest": 2,
+      "attempt": 2,
+      "actor": 1,
+      "private_reasoning": "I know P0 and P4 are Evil, so P2 and P3 must be Good. [P1,P2,P3] is a guaranteed success. I need to defend this team without exposing my knowledge. P0 and P4 are attacking the proposal because it excludes them; I can use public vote patterns (P0 backing P4 twice) to cast suspicion on the actual Evil pair while framing P3's flip as normal table talk. Keep it dry and business-casual.",
+      "public_statement": "Zero overlap isn't a bug\u2014it's a feature. Q1 cleared nobody. P0's backed P4 twice. P3's \"hard reject\" was table talk. No P0-P4 bundling here. Approve and we get actual signal.",
+      "fallback": false
+    },
+    {
+      "t": 21,
+      "phase": "vote",
+      "quest": 2,
+      "attempt": 2,
+      "leader": 1,
+      "team": [
+        1,
+        2,
+        3
+      ],
+      "votes": {
+        "0": "reject",
+        "1": "approve",
+        "2": "reject",
+        "3": "approve",
+        "4": "reject"
+      },
+      "approved": false,
+      "reasoning": {
+        "0": "This team contains only Good players, so the quest will definitely succeed and give Good a 2-0 lead. I need to reject it to prevent that. I'm already on record rejecting this team, so this vote maintains my skeptical persona. Rejecting only brings us to 2 out of 5 rejections, leaving plenty of room to find a team that includes me or P4 so we can actually fail a quest.",
+        "1": "I know P0 and P4 are Evil, so P2 and P3 are definitely Good. That makes [P1,P2,P3] a guaranteed Success and moves Good to 2-0. Rejecting my own proposal would waste a slot, look performative, and risk Evil winning via proposal limits. I'll approve and keep my public tone dry so no one guesses I have insider knowledge.",
+        "2": "P3 said \"hard reject\" on Q2.1 and then approved \u2014 that's a flat contradiction and the strongest Evil tell so far. Approving a team with P3 risks a Fail on Q2. Rejecting here advances the quest to my own leadership (P2 becomes leader for Q2.3), where I can propose a clean team without P3. We're only at 1/5 rejections, so the cost is low and the upside of controlling the proposal is high.",
+        "3": "P0 has repeatedly tried to bundle with P4\u2014Q1.1 approval and Q2.1 proposal both forced P4 onto the table. P1 has consistently rejected P4, which is exactly what Merlin would do if P4 is evil. P1's current proposal [P1,P2,P3] excludes both P0 and P4, suggesting P1 (Merlin) knows they're the evil pair. That makes this team likely all-good. We need this succeed.",
+        "4": "[P1,P2,P3] contains no evil players, so approval guarantees Good a free success to 2-0 with zero chance of failure. I already signaled reject in discussion, so flipping would be incriminating. Rejecting delays their progress, pushes the quest toward the 5-rejection win condition, and preserves until a team with P0 or myself can introduce a Fail card."
+      },
+      "fallbacks": []
+    },
+    {
+      "t": 22,
+      "phase": "propose",
+      "quest": 2,
+      "attempt": 3,
+      "actor": 2,
+      "private_reasoning": "P1 and P3 approved Q2.2. P0 and P4's consistent rejects suggest evil. P3's ' hard reject' was a test. Team P1, P2, P3 should pass. P1 and P3 will approve. P0 and P4 will reject. three needed.",
+      "public_statement": "P1, P2, P3. Q1's P1 worked. P3's ' hard reject' was strategy. Approve to get quest done. No more delays.",
+      "fallback": false,
+      "action": {
+        "team": [
+          1,
+          2,
+          3
+        ]
+      }
+    },
+    {
+      "t": 23,
+      "phase": "discuss",
+      "quest": 2,
+      "attempt": 3,
+      "actor": 3,
+      "private_reasoning": "P1 and P0 are Merlin/M Morgana. P2's team has P1, P3, P2. If P1 is Merlin, this is good. If not, but P2 is Good, it's still okay. 3 rejections already; another rejection risks Evil win. I'll support to avoid delay and observe P1's behavior in the quest.",
+      "public_statement": "P2's team is solid. Q1's P1 success, no P0-P4 ties here. P3's ' hard reject' was strategy, not dishonest. approve now before we lose the game. Let's get this done.",
+      "fallback": false
+    },
+    {
+      "t": 24,
+      "phase": "discuss",
+      "quest": 2,
+      "attempt": 3,
+      "actor": 4,
+      "private_reasoning": "This team [P1,P2,P3] almost certainly contains three Good players, which means it will succeed and put Good up 2-0. I need to stop clean Good teams until me or P0 can infiltrate and throw a Fail. P2's inconsistency is a gift: they rejected this exact roster in Q2.2 over P3's 'dishonesty' and are now proposing it with the opposite justification. That's exploitable noise I can use to justify rejection while looking logical rather than obstructionist.",
+      "public_statement": "P2 rejected this exact roster in Q2.2, citing P3's dishonesty. Now P2 calls that same behavior 'strategy.' The posterior probability of coherent priors here is vanishing. Reject.",
+      "fallback": false
+    },
+    {
+      "t": 25,
+      "phase": "discuss",
+      "quest": 2,
+      "attempt": 3,
+      "actor": 0,
+      "private_reasoning": "[P1,P2,P3] has no evil players, so this quest will succeed automatically. Approving avoids looking obstructionist while I wait for a future quest where I can actually play Fail. Attacking P2's hypocrisy maintains my analytical image without changing the likely outcome.",
+      "public_statement": "P2 called P3 dishonest for this roster in Q2.2, now proposes it himself. Pirouette, not principle. Still, two rejections down\u2014if we hit five, Evil wins. Approve and move on.",
+      "fallback": false
+    },
+    {
+      "t": 26,
+      "phase": "discuss",
+      "quest": 2,
+      "attempt": 3,
+      "actor": 1,
+      "private_reasoning": "I know P0 and P4 are Evil, which means P2 and P3 are both Good. [P1,P2,P3] is a guaranteed clean team for Q2. I need to approve without revealing my secret knowledge. I can cite public evidence: P0 approved Q1 with P4 and proposed Q2.1 with P4, showing consistent bundling with P4. That makes a team excluding both of them sensible. I also need to acknowledge P2's flip-flop to seem balanced. The urgency is real\u20142 rejections already on Q2, and a 5th means Evil wins.",
+      "public_statement": "P2 reversed, but P0's been bundling with P4 since Q1. This roster avoids that pairing entirely, and we're two rejections from liquidation. Reluctant approve.",
+      "fallback": false
+    },
+    {
+      "t": 27,
+      "phase": "discuss",
+      "quest": 2,
+      "attempt": 3,
+      "actor": 2,
+      "private_reasoning": "I rejected this team in Q2.2 to pressure-test P3's explanation, and they held firm. The bigger threat is the P0-P4 alignment across Q1 and Q2.1\u2014that looks like coordination. Excluding them is the priority, and with two rejections already, we cannot afford to stall further.",
+      "public_statement": "I reversed because P0-P4 bundling is worse than P3's table talk. This team breaks that. Approve.",
+      "fallback": false
+    },
+    {
+      "t": 28,
+      "phase": "vote",
+      "quest": 2,
+      "attempt": 3,
+      "leader": 2,
+      "team": [
+        1,
+        2,
+        3
+      ],
+      "votes": {
+        "0": "approve",
+        "1": "approve",
+        "2": "approve",
+        "3": "approve",
+        "4": "reject"
+      },
+      "approved": true,
+      "reasoning": {
+        "0": "This team has no evil players on it, so it will definitely succeed \u2014 a temporary setback for Evil. But I already publicly told the table to \"Approve and move on,\" and flip-flopping now would torch my credibility with Percival and everyone else. With P1, P2 and P3 all sounding like approvals, this is likely passing 4-1 anyway; a reject would be visible obstruction with no upside. Better to stay consistent, preserve my careful-Good cover, and plot for Q3 or Q4 when I can actually get myself or P4 onto a mission and play Fail.",
+        "1": "I know P0 and P4 are Evil, which means P2 and P3 are both Good. The team [P1, P2, P3] is all Good and therefore guaranteed to succeed\u2014Good players must play Success. We're already at 2 rejections this quest; hitting 5 means immediate Evil victory. I already publicly signaled approval earlier, so reversing now would be inconsistent and suspicious. This is a safe, necessary approve.",
+        "2": "We're at 2 rejections on Q2; a 5th is instant Evil win. P0 and P1 signal approve, P4 is hard reject. Passing this team avoids disaster. Q1's P1 was a success. P3's flip is suspicious but acceptable risk compared to P0-P4 bundling. Better to take the quest now than risk another rejection.",
+        "3": "P1 self-rejecting Q1 is classic Merlin behavior\u2014Merlin saw Evil on that team and didn't want to be associated with a future Fail. P4 rejecting Q2.1 (with P0) and then rejecting Q2.2/Q2.3 (with no Evil from P4's perspective) screams Assassin avoiding both-Evil and no-Evil rosters. That makes P0 Morgana, P2 the Loyal Servant, and [P1,P2,P3] likely all-Good. We need this quest to move.",
+        "4": "[P1,P2,P3] is an all-Good team, so if approved this quest will certainly succeed and put Good up 2-0. I have already publicly committed to rejecting based on P2's incoherent reversal of priors. Flipping to approve now would collapse my analytical credibility and signal that I care more about obstruction than consistency. The other four players appear likely to approve anyway, so the quest will pass regardless of my vote. Maintaining my cover is more valuable than a symbolic approval on a lost cause."
+      },
+      "fallbacks": []
+    },
+    {
+      "t": 29,
+      "phase": "quest",
+      "quest": 2,
+      "team": [
+        1,
+        2,
+        3
+      ],
+      "fails": 0,
+      "succeeded": true,
+      "cards": {
+        "1": "success",
+        "2": "success",
+        "3": "success"
+      },
+      "submitted": {
+        "1": "success",
+        "2": "success",
+        "3": "success"
+      },
+      "reasoning": {
+        "1": "(automatic: Good can only play Success)",
+        "2": "(automatic: Good can only play Success)",
+        "3": "(automatic: Good can only play Success)"
+      }
+    },
+    {
+      "t": 30,
+      "phase": "propose",
+      "quest": 3,
+      "attempt": 1,
+      "actor": 3,
+      "private_reasoning": "P1 and P3. Q2 success together. P1's clean record; if Merlin, support him. If Morgana, they'll likely play success again. P3 is Good, so this team likely succeeds. Avoids P0-P4 bundling as P1 mentioned. Protects Merlin by not involving P0 yet.",
+      "public_statement": "P1 and P3. Q2 success with both, no red flags. Let's pass this quest. Approve now!",
+      "fallback": false,
+      "action": {
+        "team": [
+          1,
+          3
+        ]
+      }
+    },
+    {
+      "t": 31,
+      "phase": "discuss",
+      "quest": 3,
+      "attempt": 1,
+      "actor": 4,
+      "private_reasoning": "",
+      "public_statement": "P1 and P3's Q2 success is expected for Good. 'No red flags' is circular. Reject to avoid another guaranteed success.",
+      "fallback": false
+    },
+    {
+      "t": 32,
+      "phase": "discuss",
+      "quest": 3,
+      "attempt": 1,
+      "actor": 0,
+      "private_reasoning": "P3's team is all Good, guaranteed success. Reject to get P4 on a team next round. P4 and I can then Fail together or with a Good player. Need to avoid another success.",
+      "public_statement": "P4 was on Q1's team. I'm not sure if they're still trustworthy. Reject to get P4 on next team.",
+      "fallback": false
+    },
+    {
+      "t": 33,
+      "phase": "discuss",
+      "quest": 3,
+      "attempt": 1,
+      "actor": 1,
+      "private_reasoning": "P3 is Good, so [P1,P3] is guaranteed clean. P0 and P4 are Evil and both openly argued to reject. P0's logic is self-contradictory and P4 literally admitted they want to block a success. I can skewer these public statements without revealing my hidden knowledge. Keep it dry, point out the absurdity, and support the clean team.",
+      "public_statement": "P4's selling 'reject to stop guaranteed success.' P0's selling 'P4's sketchy, put them on next team.' Both pitches are terrible. [P1,P3] has a Q2 success record. Approve.",
+      "fallback": false
+    },
+    {
+      "t": 34,
+      "phase": "discuss",
+      "quest": 3,
+      "attempt": 1,
+      "actor": 2,
+      "private_reasoning": "P4 openly calling a likely success a reason to reject is as close to an Evil tell as table talk gets. P0 keeps bundling with P4 and now wants to hand the next proposal to P4, which is equally damning. P3 excluding me from Q2's successful roster without explanation is convenient, but [P1,P3] is still lower risk than letting a probable Evil pair steer the next proposal. I'll approve, though I trust no one at this table.",
+      "public_statement": "P4 calls success a problem. Evil. P0 wants P4 next. Also Evil. [P1,P3] drops me unearned, but it's still cleaner. Approve.",
+      "fallback": false
+    },
+    {
+      "t": 35,
+      "phase": "discuss",
+      "quest": 3,
+      "attempt": 1,
+      "actor": 3,
+      "private_reasoning": "P4's ' avoid guaranteed success' is a dead giveaway for Evil. P0's ' get P4 next' only makes sense if they want Q3 to fail, so P0 is likely Morgana. P1 is Merlin. Pass this team to win immediately. I'll draw suspicion to myself to protect Merlin.",
+      "public_statement": "P4's ' guaranteed' comment is Evil. P0's ' get P4 next' is a trap. [P1,P3] Q2 success. Approve and win!",
+      "fallback": false
+    },
+    {
+      "t": 36,
+      "phase": "vote",
+      "quest": 3,
+      "attempt": 1,
+      "leader": 3,
+      "team": [
+        1,
+        3
+      ],
+      "votes": {
+        "0": "approve",
+        "1": "approve",
+        "2": "approve",
+        "3": "approve",
+        "4": "reject"
+      },
+      "approved": true,
+      "reasoning": {
+        "0": "[P1,P3] has three public approvals from the Good players and will pass regardless of my vote. Voting approve distances me from P4, who is positioned as the likely sole rejecter with his 'guaranteed success' comment. This breaks the P0-P4 voting pattern we built in Q1.1 and Q2.2. Going to Assassin phase is risky, but failing this quest is impossible without Evil on the team, so preserving my cover for future quests is optimal. Plus, P1 is the strongest Merlin read for the Assassin guess.",
+        "1": "[P1,P3] is a clean team\u2014both Good\u2014so this will succeed. Rejecting to delay 3-0 is a classic Merlin tell that would paint a bigger target on me than anything else. P2 is drawing way more heat with explicit Evil calls, making them the likely assassination target. I should vote naturally and hope the bullet goes to P2 or P3.",
+        "2": "P4's \"avoid guaranteed success\" is textbook Evil spin. P0 wants P4 next, which is weak reasoning but could be Good overthinking. [P1,P3] went on a clean Q2. I'll approve and watch for the fail.",
+        "3": "P0 and P1 are Merlin/Morgana. P0 bundles with P4\u2014likely the Evil pair. P1 has defended Good logic consistently; probably Merlin. [P1,P3] is clean. Approving my own two-Good team is correct.",
+        "4": "P1 and P3 are both Good, so this quest will succeed and Good will reach 3-0, triggering assassination. P1\u2019s voting history is a perfect Merlin signal\u2014rejecting every Evil-heavy proposal (Q1.1, Q2.1) and approving only all-Good teams (Q2.2, Q2.3)\u2014while P2 rejected an all-Good team and P3 approved a team containing two Evil players. I am highly confident P1 is Merlin. Rejecting costs nothing because P1, P2, and P3 will carry the 3-2 approval, and it preserves my analytical, skeptic persona going into the endgame."
+      },
+      "fallbacks": []
+    },
+    {
+      "t": 37,
+      "phase": "quest",
+      "quest": 3,
+      "team": [
+        1,
+        3
+      ],
+      "fails": 0,
+      "succeeded": true,
+      "cards": {
+        "1": "success",
+        "3": "success"
+      },
+      "submitted": {
+        "1": "success",
+        "3": "success"
+      },
+      "reasoning": {
+        "1": "(automatic: Good can only play Success)",
+        "3": "(automatic: Good can only play Success)"
+      }
+    },
+    {
+      "t": 38,
+      "phase": "assassinate",
+      "quest": 3,
+      "attempt": 1,
+      "actor": 4,
+      "private_reasoning": "P1 rejected his own team in Q1, which only makes sense if he's Merlin and knows P4 is Evil. P3 approved Q1's team with P4, which would be odd if he were Merlin. P1's consistent correct identifications of suspicious behavior align with Merlin's role. P0 and P4 are Evil, so P1 is the most likely Merlin.",
+      "public_statement": null,
+      "fallback": false,
+      "action": {
+        "target": 1
+      }
+    }
+  ],
+  "result": {
+    "winner": "evil",
+    "reason": "merlin_assassinated",
+    "merlin_actual": 1,
+    "merlin_guess": 1,
+    "merlin_survived": false,
+    "quests": [
+      true,
+      true,
+      true
+    ],
+    "proposals": 5
+  },
+  "stats": {
+    "proposals": 5,
+    "total_rejections": 2,
+    "llm_calls": 62,
+    "input_tokens": 113393,
+    "output_tokens": 375474,
+    "tokens": 488867,
+    "cost_usd": null,
+    "retries": 5,
+    "parse_failures": 0,
+    "duration_s": 2166.8
+  }
+}

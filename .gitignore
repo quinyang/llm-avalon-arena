@@ -4,3 +4,5 @@ __pycache__/
 .env
 .DS_Store
 transcripts/fake_*.json
+transcripts/live_*.json
+transcripts/*.tmp

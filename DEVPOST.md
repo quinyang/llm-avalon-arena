@@ -1,7 +1,5 @@
 # LLM Avalon Arena
 
-> Numbers below are from 9 games. Re-run `python analyze.py` after the batch and update the four marked [#] spots.
-
 ## Inspiration
 
 Most agent demos are one agent doing one task. I wanted agents reasoning about *each other*, with secrets. Avalon is the cleanest test: Merlin knows who the traitors are, but if the Assassin spots him at the end, Evil wins anyway. Being right isn't enough. You have to be right quietly.
@@ -22,14 +20,15 @@ Every move produces two things, stored separately: what the agent privately thin
 ## Challenges we ran into
 
 - We had no Anthropic credits, so we switched to ASI:One mid-hackathon and wrote an adapter for it.
-- ASI spends about 5,000 hidden reasoning tokens per move, so early answers got cut off before the move was written. Raising the budget and adding a JSON fallback took format failures down to 5 in 641 calls. [#]
+- ASI spends about 5,000 hidden reasoning tokens per move, so early answers got cut off before the move was written. Raising the budget and adding a JSON fallback took format failures down to 10 in 936 calls.
 - Each game takes 15 to 50 minutes, so we ran games in parallel and built a live view.
 - Merlin kept giving himself away. Rather than hide it, we made it the headline metric.
 
 ## Accomplishments that we're proud of
 
-- **Merlin survived only 2 of 9 assassinations.** [#] A random Assassin would miss him 75% of the time.
-- **Merlin voted against 31 of 33 teams that contained an Evil player, and 0 of 17 all-Good teams.** [#] His speeches were careful; his votes told the Assassin everything.
+- **Merlin survived only 3 of 13 assassinations** (95% range 8% to 50%). A random Assassin would miss him 75% of the time.
+- **Merlin voted against 41 of 49 teams that contained an Evil player, and 0 of 24 all-Good teams.** His speeches were careful; his votes told the Assassin everything.
+- **When Good did win, Percival usually took the bullet.** In 2 of the 3 Good wins, the Assassin shot Percival, who had been voting like someone with perfect information to draw fire. In one game the Assassin even read the real Merlin's matching votes as "Percival shadowing Merlin."
 - A complete, correct Avalon with all five roles, hidden information, the five-rejection rule and the assassination endgame, validated before a single model call.
 
 ## What we learned

@@ -279,12 +279,14 @@ def main() -> None:
     def one(i: int) -> dict:
         prefix = "fake_" if args.fake else ""
         live = None if args.no_live else outdir / f"{prefix}live_{base_seed + i}.json"
-        tr = play_game(cfg, client, base_seed + i, verbose, live_path=live)
-        stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-        path = outdir / f"{prefix}{stamp}_{tr['game_id'][:8]}.json"
-        _atomic_write(path, tr)
-        if live is not None:
-            live.unlink(missing_ok=True)  # finished: the viewer switches to the final file
+        try:
+            tr = play_game(cfg, client, base_seed + i, verbose, live_path=live)
+            stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+            path = outdir / f"{prefix}{stamp}_{tr['game_id'][:8]}.json"
+            _atomic_write(path, tr)
+        finally:
+            if live is not None:
+                live.unlink(missing_ok=True)  # finished or crashed: never leave a stale live file
         r, s = tr["result"], tr["stats"]
         print(f"[game {i + 1}/{args.games}] {r['winner']:>4} via {r['reason']:<24} "
               f"proposals={s['proposals']} calls={s['llm_calls']} cost=${s['cost_usd']} "

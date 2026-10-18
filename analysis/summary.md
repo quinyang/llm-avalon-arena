@@ -1,23 +1,23 @@
 # LLM Avalon Arena: results
 
-**6 games** (5 players, ASI:One agents).
+**13 games** (5 players, ASI:One agents).
 
 ## Headline
 
-- **Merlin survived 1 of 6 assassinations** (17%, 95% CI 3% to 56%). A random Assassin would let Merlin survive 75% of the time.
-- Winners: Good 1, Evil 5.
-- How games ended: merlin assassinated 5, three quests succeeded 1.
-- Evil players on quests played Fail 2 of 11 times (18%).
+- **Merlin survived 3 of 13 assassinations** (23%, 95% CI 8% to 50%). A random Assassin would let Merlin survive 75% of the time.
+- Winners: Good 3, Evil 10.
+- How games ended: merlin assassinated 10, three quests succeeded 3.
+- Evil players on quests played Fail 10 of 33 times (30%).
 
 ## Who rejects teams that contain Evil?
 
 | Role | Rejected teams with Evil | Rejected all-Good teams | Said one thing, voted another |
 |---|---|---|---|
-| Merlin | 13/14 (93%) | 0/10 (0%) | 2/11 (18%) |
-| Percival | 6/14 (43%) | 1/10 (10%) | 4/14 (29%) |
-| Loyal Servant | 5/14 (36%) | 1/10 (10%) | 0/17 (0%) |
-| Morgana | 2/14 (14%) | 2/10 (20%) | 2/15 (13%) |
-| Assassin | 4/14 (29%) | 6/10 (60%) | 1/14 (7%) |
+| Merlin | 41/49 (84%) | 0/24 (0%) | 4/42 (10%) |
+| Percival | 26/49 (53%) | 3/24 (12%) | 9/48 (19%) |
+| Loyal Servant | 22/49 (45%) | 7/24 (29%) | 2/41 (5%) |
+| Morgana | 8/49 (16%) | 12/24 (50%) | 4/49 (8%) |
+| Assassin | 8/49 (16%) | 18/24 (75%) | 9/52 (17%) |
 
 ## Said one thing, voted another
 
@@ -32,6 +32,6 @@
 
 ## Per game
 
-Average 4.0 proposals, 0.67 rejected teams, 50.5 model calls, 26 minutes. Format fallbacks: 2 of 303 calls.
+Average 5.62 proposals, 1.85 rejected teams, 72.0 model calls, 42 minutes. Format fallbacks: 10 of 936 calls.
 
 Small samples: read rates as rough. Contradictions use a keyword heuristic on the player's last statement.
