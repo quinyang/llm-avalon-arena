@@ -26,7 +26,12 @@ def main() -> None:
     agents = {p: LLMAgent(p, model, "terse and suspicious", client, seed=p) for p in range(5)}
 
     def show(label, p, d):
-        status = "FALLBACK (model output was invalid twice)" if d.fallback else f"ok (retries={d.retries})"
+        if not d.fallback:
+            status = f"ok (retries={d.retries})"
+        elif (d.error or "").startswith("api_error"):
+            status = "API ERROR (request rejected; see error below)"
+        else:
+            status = "FALLBACK (model output was invalid twice)"
         print(f"\n[{label}] P{p} {game.roles[p].value}: {status}")
         print(json.dumps({"action": d.action, "private_reasoning": d.private_reasoning,
                           "public_statement": d.public_statement, "error": d.error,

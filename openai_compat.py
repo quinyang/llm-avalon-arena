@@ -114,4 +114,4 @@ class OpenAICompatClient:
         if not key:
             raise SystemExit("Set ASI_ONE_API_KEY (create one at asi1.ai under your profile / API keys).")
         client = OpenAI(api_key=key, base_url=ASI_BASE_URL, max_retries=6, timeout=120)
-        return cls(client, extra_body={"web_search": False})
+        return cls(client)  # note: the documented "web_search" extra field is rejected (400) by the live API
