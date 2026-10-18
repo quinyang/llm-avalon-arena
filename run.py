@@ -21,7 +21,7 @@ from pathlib import Path
 
 from agent import Decision, LLMAgent, cost_usd, random_legal
 from game import AvalonGame, IllegalAction, Phase
-from prompts import PERSONALITIES
+from prompts import character_summary, make_characters, roster_line
 from roles import ROLES_5P, Team, team_of
 
 PROVIDER_DEFAULT_MODELS = {"anthropic": "claude-haiku-4-5", "asi": "asi1-fast", "fake": "fake"}
@@ -43,13 +43,14 @@ def make_client(provider: str, seed: int):
 
 
 class Printer:
-    def __init__(self, game: AvalonGame, enabled: bool):
-        self.game, self.enabled = game, enabled
+    def __init__(self, game: AvalonGame, enabled: bool, names: list[str] | None = None):
+        self.game, self.enabled, self.names = game, enabled, names
 
     def name(self, p: int) -> str:
         role = self.game.roles[p]
         c = EVIL_C if team_of(role) is Team.EVIL else GOOD_C
-        return f"{c}P{p} ({role.value}){RESET}"
+        who = f"{self.names[p]}, " if self.names else ""
+        return f"{c}P{p} ({who}{role.value}){RESET}"
 
     def sys(self, msg: str) -> None:
         if self.enabled:
@@ -87,13 +88,15 @@ def play_game(cfg: dict, client, seed: int, verbose: bool, live_path: Path | Non
     game_id = str(uuid.uuid4())
     rng = random.Random(seed)
     game = AvalonGame(seed=seed, discussion_rounds=cfg["discussion_rounds"], first_leader=rng.randrange(5))
-    personalities = rng.sample(PERSONALITIES, game.n)
+    characters = make_characters(rng, game.n)
+    personalities = [character_summary(c) for c in characters]  # short form, kept for older viewers
+    table = roster_line(characters)
     seat_models = {p: cfg["models"][game.roles[p].value] for p in range(game.n)}
     agents = [
-        LLMAgent(p, seat_models[p], personalities[p], client, cfg["word_limit"], seed=seed * 10 + p)
+        LLMAgent(p, seat_models[p], characters[p], client, cfg["word_limit"], seed=seed * 10 + p, table=table)
         for p in range(game.n)
     ]
-    out = Printer(game, verbose)
+    out = Printer(game, verbose, [c["name"] for c in characters])
     events: list[dict] = []
     decisions: list[Decision] = []
     meta = {
@@ -103,6 +106,7 @@ def play_game(cfg: dict, client, seed: int, verbose: bool, live_path: Path | Non
             "models": cfg["models"],
             "seat_models": {str(p): m for p, m in seat_models.items()},
             "personalities": {str(p): s for p, s in enumerate(personalities)},
+            "characters": {str(p): c for p, c in enumerate(characters)},
             "discussion_rounds": cfg["discussion_rounds"],
             "word_limit": cfg["word_limit"],
             "seed": seed,

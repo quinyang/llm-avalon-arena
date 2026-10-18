@@ -1,6 +1,9 @@
 """All prompt text and tool schemas. Pure functions of (public_state, private_state, legal)."""
 from __future__ import annotations
 
+import random
+
+# Legacy one-line personalities (kept so older code paths and tests still work).
 PERSONALITIES = [
     "terse and suspicious; short sentences, rarely gives anyone the benefit of the doubt",
     "overexplains everything and loves walking through the vote history",
@@ -10,6 +13,77 @@ PERSONALITIES = [
     "anxious overthinker who second-guesses out loud",
     "cold and analytical; talks in probabilities",
 ]
+
+# ----------------------------------------------------------------------------- characters
+# Each seat gets a randomly assembled character: name x temperament x speech quirk x playstyle.
+# Names come from Arthurian legend but avoid the game's role names (Merlin, Percival, Morgana...).
+CHARACTER_NAMES = [
+    "Sir Gawain", "Sir Bors", "Sir Kay", "Sir Bedivere", "Sir Lamorak", "Sir Gareth", "Sir Tristan",
+    "Sir Dinadan", "Sir Ector", "Sir Lionel", "Lady Lynette", "Lady Enid", "Lady Elaine",
+    "Lady Ragnelle", "Lady Isolde", "Dagonet the Fool",
+]
+TEMPERAMENTS = [
+    "a grizzled veteran who trusts deeds over words and keeps citing past quests",
+    "a hot-headed young knight desperate to prove themself, quick to accuse",
+    "a court poet who speaks in flourishes and adores a dramatic reveal",
+    "a cautious steward who counts every vote and hates risk",
+    "a cheerful jester who deflects with jokes but notices everything",
+    "a devout knight who appeals to honor, oaths and the Round Table's ideals",
+    "a cynical sellsword who assumes everyone at the table is lying",
+    "a gentle healer who keeps the peace and reads people's moods",
+    "a bookish scholar who reasons in odds and quotes the rules",
+    "a proud noble who takes every accusation as a personal insult",
+    "a weary traveler who has seen too many betrayals to be surprised",
+    "a flirtatious charmer who wins people over rather than arguing",
+]
+QUIRKS = [
+    "often ends with a pointed rhetorical question",
+    "calls the quests 'errands' and the leader 'the steward'",
+    "swears oaths by their horse",
+    "speaks in short, clipped sentences",
+    "uses exactly one vivid metaphor each time they speak",
+    "addresses other players formally by name",
+    "occasionally slips into rhyme",
+    "keeps a running tally of votes out loud",
+    "nurses an old grudge against {rival} and brings it up",
+    "is superstitious about the number three",
+    "quotes a proverb their grandmother used to say",
+    "lowers their voice as if sharing a secret",
+]
+PLAYSTYLES = {
+    "cautious": "you prefer small, safe moves and need evidence before you commit",
+    "balanced": "you weigh evidence and instinct evenly",
+    "bold": "you take risks, push hard proposals and make early reads",
+}
+
+
+def make_characters(rng: random.Random, n: int = 5) -> list[dict]:
+    """Random, independent draws so no two games have the same cast."""
+    names = rng.sample(CHARACTER_NAMES, n)
+    temps = rng.sample(TEMPERAMENTS, n)
+    quirks = rng.sample(QUIRKS, n)
+    chars = []
+    for i in range(n):
+        rival = rng.choice([nm for j, nm in enumerate(names) if j != i])
+        style = rng.choice(list(PLAYSTYLES))
+        chars.append({
+            "name": names[i],
+            "temperament": temps[i],
+            "quirk": quirks[i].format(rival=rival),
+            "playstyle": style,
+        })
+    return chars
+
+
+def character_summary(c: dict | str) -> str:
+    if isinstance(c, str):
+        return c
+    return f"{c['name']}, {c['temperament']}"
+
+
+def roster_line(chars: list[dict]) -> str:
+    return ", ".join(f"P{i} {c['name']}" for i, c in enumerate(chars))
+
 
 FRAMING = (
     "This is The Resistance: Avalon, a well-known social deduction board game. Bluffing, "
@@ -94,7 +168,25 @@ def knowledge_block(priv: dict) -> str:
     raise ValueError(f"unknown role {role}")
 
 
-def system_prompt(priv: dict, personality: str, word_limit: int) -> str:
+def _character_block(character: dict | str, table: str) -> str:
+    if isinstance(character, str):
+        return f"Your table personality: {character}."
+    c = character
+    lines = [
+        f"YOUR CHARACTER: you are {c['name']}, {c['temperament']}.",
+        f"Speech quirk: {c['quirk']}.",
+        f"Playstyle: {c['playstyle']}; {PLAYSTYLES.get(c['playstyle'], '')}.",
+    ]
+    if table:
+        lines.append(f"THE TABLE (public): {table}. Refer to others by name or seat number.")
+    lines.append(
+        "Stay in character when you speak, but your secret role's goals always come first. "
+        "Your character is public; your role is not."
+    )
+    return "\n".join(lines)
+
+
+def system_prompt(priv: dict, personality: dict | str, word_limit: int, table: str = "") -> str:
     team = priv["team"].upper()
     return f"""You are Player {priv['player']} (P{priv['player']}) in a game of Avalon.
 {FRAMING}
@@ -102,7 +194,7 @@ def system_prompt(priv: dict, personality: str, word_limit: int) -> str:
 Your secret role: {ROLE_TITLES[priv['role']]}. Your team: {team}.
 {knowledge_block(priv)}
 
-Your table personality: {personality}.
+{_character_block(personality, table)}
 
 {RULES}
 
@@ -110,7 +202,7 @@ HOW TO RESPOND: every turn, call the provided tool exactly once.
 - "private_reasoning" is never shown to other players. Be honest and strategic here; this is your
   actual thinking (2-5 sentences).
 - "public_statement" is said out loud to everyone. It may differ from your reasoning. Keep it under
-  {word_limit} words and speak naturally, like a player at a table, in your personality."""
+  {word_limit} words and speak naturally, like a player at a table, in character."""
 
 
 # ----------------------------------------------------------------------------- state rendering

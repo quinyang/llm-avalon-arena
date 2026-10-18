@@ -49,6 +49,13 @@ roles and every private thought next to what was said out loud. Space plays/paus
 during each game (disable with `--no-live`). Purple dots and "said X, voted Y" notes mark players whose vote
 contradicted what they said. You can also drag a transcript file onto the page without the server.
 
+## Characters
+
+Every game deals each seat a random character (`prompts.make_characters`): an Arthurian name, a temperament,
+a speech quirk (sometimes a grudge against another player) and a cautious/balanced/bold playstyle. Names
+are public and shown to every agent; roles stay secret. Characters are saved under `config.characters` in
+each transcript and shown in the viewer, with role emblems when secrets are on.
+
 ## Files
 
 | File | What |

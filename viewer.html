@@ -120,6 +120,24 @@ main {
 .crown { fill: var(--gold); stroke: #7a5f22; stroke-width: 1; }
 .target-ring { fill: none; stroke: var(--evil); stroke-width: 3; stroke-dasharray: 6 5; }
 .thinking { font: italic 14px var(--serif); fill: var(--thought); text-anchor: middle; }
+.seat-name { font: 600 16px var(--serif); fill: var(--parchment); text-anchor: middle; }
+.badge circle { stroke: var(--hall); stroke-width: 3; }
+.badge.good circle { fill: var(--good); } .badge.evil circle { fill: var(--evil); }
+.badge path { fill: #fff; }
+.emblem { vertical-align: -3px; margin-right: 4px; }
+.emblem.good path { fill: #8fb3e6; } .emblem.evil path { fill: #e48990; }
+.role-tag { white-space: nowrap; }
+.seatno { font: 500 13px var(--sans); color: var(--muted); }
+.cast { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; margin-top: 4px; }
+.cast-card { border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; background: var(--hall-2); }
+.cast-card.good { border-color: #3b5f93; } .cast-card.evil { border-color: #86323a; }
+.cast-head { display: flex; gap: 10px; align-items: center; margin-bottom: 6px; }
+.cast-head .emblem { margin: 0; flex: none; }
+.emblem-hidden { width: 26px; height: 26px; border-radius: 50%; border: 1.5px dashed var(--muted); display: grid; place-items: center; color: var(--muted); font-weight: 700; flex: none; }
+.cast-name { font: 600 17px var(--serif); color: var(--parchment); }
+.cast-role { font-size: 13px; color: var(--muted); line-height: 1.3; }
+.cast-body { font: 15px/1.45 var(--serif); color: #d6d0c2; }
+.cast-body .quirk { color: var(--muted); font-family: var(--sans); font-size: 14px; }
 
 /* now panel */
 .now { grid-area: now; padding: 18px 20px; overflow: auto; min-height: 0; border-right: 1px solid var(--rule); }
@@ -233,8 +251,8 @@ body.dragging .drop-hint { display: grid; }
             <stop offset="0%" stop-color="var(--felt-hi)"/><stop offset="100%" stop-color="var(--felt)"/>
           </radialGradient>
         </defs>
-        <circle cx="320" cy="320" r="182" fill="var(--oak)" stroke="var(--oak-hi)" stroke-width="3"/>
-        <circle cx="320" cy="320" r="158" fill="url(#feltGrad)"/>
+        <circle cx="320" cy="320" r="168" fill="var(--oak)" stroke="var(--oak-hi)" stroke-width="3"/>
+        <circle cx="320" cy="320" r="146" fill="url(#feltGrad)"/>
         <g id="layer-tokens"></g>
         <g id="layer-seats"></g>
       </svg>
@@ -263,14 +281,24 @@ body.dragging .drop-hint { display: grid; }
 <script>
 "use strict";
 const ROLE = {
-  merlin: { name: "Merlin", team: "good" },
-  percival: { name: "Percival", team: "good" },
-  loyal_servant: { name: "Loyal Servant", team: "good" },
-  morgana: { name: "Morgana", team: "evil" },
-  assassin: { name: "Assassin", team: "evil" },
+  merlin: { name: "Merlin", team: "good", blurb: "Knows who is Evil, must not be found out",
+    // pointed wizard hat with a star
+    glyph: "M-9 8 H9 L5 4 L1 -10 L-3 -3 L-5 4 Z M5 -9 l1 2 2 .3 -1.5 1.4 .4 2.1 -1.9 -1 -1.9 1 .4 -2.1 -1.5 -1.4 2 -.3 Z" },
+  percival: { name: "Percival", team: "good", blurb: "Sees Merlin and Morgana, but not which is which",
+    // heater shield with a cross
+    glyph: "M0 -10 L8 -7 L7.5 1 Q6 7 0 10 Q-6 7 -7.5 1 L-8 -7 Z M-1 -6 V6 H1 V-6 Z M-5 -2 V0 H5 V-2 Z", evenodd: true },
+  loyal_servant: { name: "Loyal Servant", team: "good", blurb: "Knows nothing, must read the table",
+    // upright sword
+    glyph: "M-1.2 -10 L0 -11.5 L1.2 -10 L1.2 3 H-1.2 Z M-6 3 H6 V5 H-6 Z M-1 5 H1 V9 H-1 Z M-2 9 H2 V11 H-2 Z" },
+  morgana: { name: "Morgana", team: "evil", blurb: "Evil, and looks like Merlin to Percival",
+    // crescent moon
+    glyph: "M3 -9.5 A10 10 0 1 0 3 9.5 A12 12 0 0 1 3 -9.5 Z" },
+  assassin: { name: "Assassin", team: "evil", blurb: "Evil, and gets one shot at Merlin",
+    // dagger, tilted
+    glyph: "M-1 -11 L0 -12.5 L1 -11 L1 2 H-1 Z M-4.5 2 H4.5 V3.6 H-4.5 Z M-.9 3.6 H.9 V8 H-.9 Z M-1.6 8 H1.6 V9.8 H-1.6 Z", rotate: 35 },
 };
 const SIZES = [2, 3, 2, 3, 3];
-const C = 320, R_SEAT = 244, R_TEAM = 128, R_VOTE = 194;
+const C = 320, R_SEAT = 232, R_TEAM = 118, R_VOTE = 176;
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
@@ -280,11 +308,24 @@ let T = null, steps = [], idx = 0, god = false, playing = false, timer = null, s
 const roleOf = (p) => T.roles[String(p)];
 const teamOf = (p) => ROLE[roleOf(p)]?.team;
 const seatXY = (p, r) => { const a = (-90 + p * 72) * Math.PI / 180; return [C + r * Math.cos(a), C + r * Math.sin(a)]; };
-const name = (p, forceRole) => (god || forceRole) ? `P${p} <span class="${teamOf(p)}-t">${ROLE[roleOf(p)].name}</span>` : `P${p}`;
-const plainName = (p) => god ? `P${p} (${ROLE[roleOf(p)].name})` : `P${p}`;
-const listPlayers = (ps) => { const n = ps.map((p) => `P${p}`); return n.length < 2 ? n.join("") : n.slice(0, -1).join(", ") + " and " + n.at(-1); };
+const charOf = (p) => T.config?.characters?.[String(p)] || null;
+const who = (p) => charOf(p)?.name || `P${p}`;
+const emblemSvg = (role, size = 18) => {
+  const r = ROLE[role];
+  return `<svg class="emblem ${r.team}" width="${size}" height="${size}" viewBox="-13 -13 26 26" aria-hidden="true"><path d="${r.glyph}" ${r.evenodd ? 'fill-rule="evenodd"' : ""} transform="rotate(${r.rotate || 0})"/></svg>`;
+};
+const roleTag = (p) => `<span class="role-tag ${teamOf(p)}-t">${emblemSvg(roleOf(p))}${ROLE[roleOf(p)].name}</span>`;
+const seatNo = (p) => (charOf(p) ? ` <span class="seatno">P${p}</span>` : "");
+const name = (p, forceRole) => `${esc(who(p))}${seatNo(p)}${(god || forceRole) ? " " + roleTag(p) : ""}`;
+const plainName = (p) => `${esc(who(p))}${god ? ` (${ROLE[roleOf(p)].name})` : ""}`;
+const listPlayers = (ps) => { const n = ps.map((p) => esc(who(p))); return n.length < 2 ? n.join("") : n.slice(0, -1).join(", ") + " and " + n.at(-1); };
 const short = (s, n) => (s && s.length > n ? s.slice(0, n - 1).trimEnd() + "…" : s || "");
-const persona = (p) => (T.config?.personalities?.[String(p)] || "").split(";")[0];
+const persona = (p) => {
+  const c = charOf(p);
+  if (c) return c.temperament;
+  return (T.config?.personalities?.[String(p)] || "").split(";")[0];
+};
+const cap = (t) => (t ? t[0].toUpperCase() + t.slice(1) : "");
 const isAuto = (txt) => !txt || txt.startsWith("(automatic");
 
 /* "said reject, voted approve": compare a player's last statement on this proposal with their vote */
@@ -366,16 +407,23 @@ function renderSeats(s, snap, final) {
     const [x, y] = seatXY(p, R_SEAT);
     const team = showRoles ? teamOf(p) : "";
     const cls = ["seat", team, snap.speaker === p ? "speaking" : ""].join(" ");
-    seats += `<g class="${cls}"><title>P${p}${showRoles ? " · " + ROLE[roleOf(p)].name : ""}: ${esc(persona(p))}</title>`;
+    seats += `<g class="${cls}"><title>${esc(who(p))} (P${p})${showRoles ? ", " + ROLE[roleOf(p)].name : ""}: ${esc(persona(p))}</title>`;
     seats += `<circle class="seat-ring" cx="${x}" cy="${y}" r="40"/>`;
     seats += `<text class="seat-label" x="${x}" y="${y}">P${p}</text>`;
-    if (showRoles) seats += `<text class="seat-role" x="${x}" y="${p === 0 ? y - 50 : y + 60}">${ROLE[roleOf(p)].name}</text>`;
+    const above = p === 0, nm = charOf(p)?.name;
+    const y1 = above ? y - (showRoles ? 70 : 52) : y + 60, y2 = y1 + 18;
+    if (nm) seats += `<text class="seat-name" x="${x}" y="${y1}">${esc(nm)}</text>`;
+    if (showRoles) {
+      seats += `<text class="seat-role" x="${x}" y="${nm ? y2 : y1}">${ROLE[roleOf(p)].name}</text>`;
+      const r = ROLE[roleOf(p)];
+      seats += `<g class="badge ${r.team}" transform="translate(${x + 29} ${y + 27})"><circle r="16"/><path d="${r.glyph}" ${r.evenodd ? 'fill-rule="evenodd"' : ""} transform="rotate(${r.rotate || 0}) scale(.95)"/></g>`;
+    }
     if (snap.leader === p && !final) {
-      const cx = x + 30, cy = y - 34;
+      const cx = x + (x < C - 1 ? -30 : 30), cy = y - 34;  // crown on the side away from the table
       seats += `<path class="crown" d="M${cx - 13} ${cy + 7} L${cx - 13} ${cy - 5} L${cx - 6} ${cy + 1} L${cx} ${cy - 9} L${cx + 6} ${cy + 1} L${cx + 13} ${cy - 5} L${cx + 13} ${cy + 7} Z"><title>Leader</title></path>`;
     }
     if (snap.target === p) seats += `<circle class="target-ring" cx="${x}" cy="${y}" r="50"/>`;
-    if (pending.includes(String(p))) seats += `<text class="thinking" x="${x}" y="${p === 0 ? y + 62 : y - 52}">thinking…</text>`;
+    if (pending.includes(String(p))) seats += `<text class="thinking" x="${x}" y="${p === 0 ? y + 62 : y - 50}">thinking…</text>`;
     seats += `</g>`;
 
     if (snap.team && snap.team.includes(p) && !final) {
@@ -413,8 +461,8 @@ function renderCenter(s, snap) {
   if (s.kind === "end") {
     const r = T.result;
     const how = {
-      merlin_assassinated: `The Assassin named P${r.merlin_guess}, and P${r.merlin_actual} was Merlin.`,
-      three_quests_succeeded: `Three quests succeeded and the Assassin named P${r.merlin_guess}. Merlin was P${r.merlin_actual} and survived.`,
+      merlin_assassinated: `The Assassin named ${esc(who(r.merlin_guess))}, who was Merlin.`,
+      three_quests_succeeded: `Three quests succeeded and the Assassin named ${esc(who(r.merlin_guess))}. Merlin was ${esc(who(r.merlin_actual))} and survived.`,
       three_quests_failed: "Three quests failed.",
       five_rejections: "Five teams in a row were rejected.",
     }[r.reason] || r.reason;
@@ -434,18 +482,17 @@ function renderNow(s, snap) {
   let h = "";
   if (s.kind === "deal") {
     h = `<h2>Five agents take their seats</h2><div class="meta">Three serve Arthur and two serve Mordred. Each knows only what their role allows.</div>`;
-    if (god) {
-      h += `<div class="rows">` + [0, 1, 2, 3, 4].map((p) => `<div class="row"><span>${name(p)}</span><span class="${teamOf(p)}-t">${teamOf(p) === "good" ? "Good" : "Evil"}</span><span class="why">${esc(persona(p))}</span></div>`).join("") + `</div>`;
-    } else h += `<p class="empty">Press Play, or turn on Show secrets to see every role and every private thought.</p>`;
+    h += `<div class="cast">` + [0, 1, 2, 3, 4].map((p) => castCard(p, god)).join("") + `</div>`;
+    if (!god) h += `<p class="empty">Press Play, or turn on Show secrets to see every role and every private thought.</p>`;
   } else if (s.kind === "propose") {
-    h = `<h2>${name(e.actor)} proposes ${listPlayers(e.action.team)}</h2><div class="meta">Quest ${e.quest}, proposal ${e.attempt}. Plays as: ${esc(persona(e.actor))}.</div>`;
+    h = `<h2>${name(e.actor)} proposes ${listPlayers(e.action.team)}</h2><div class="meta">Quest ${e.quest}, proposal ${e.attempt}. ${esc(cap(persona(e.actor)))}.</div>`;
     h += duo(e.private_reasoning, e.public_statement, `P${e.actor}`);
   } else if (s.kind === "discuss") {
-    h = `<h2>${name(e.actor)} speaks</h2><div class="meta">On the team of ${listPlayers(snap.team || [])}. Plays as: ${esc(persona(e.actor))}.</div>`;
+    h = `<h2>${name(e.actor)} speaks</h2><div class="meta">On the team of ${listPlayers(snap.team || [])}. ${esc(cap(persona(e.actor)))}.</div>`;
     h += duo(e.private_reasoning, e.public_statement, `P${e.actor}`);
   } else if (s.kind === "vote") {
     const yes = Object.values(e.votes).filter((v) => v === "approve").length;
-    h = `<h2>The vote: ${e.approved ? "approved" : "rejected"} ${yes} to ${5 - yes}</h2><div class="meta">Team ${listPlayers(e.team)}, proposed by P${e.leader}. Votes are cast together and revealed with names.</div><div class="rows">`;
+    h = `<h2>The vote: ${e.approved ? "approved" : "rejected"} ${yes} to ${5 - yes}</h2><div class="meta">Team of ${listPlayers(e.team)}, proposed by ${esc(who(e.leader))}. Votes are cast together and revealed with names.</div><div class="rows">`;
     for (let p = 0; p < 5; p++) {
       const v = e.votes[String(p)], f = s.flags[String(p)];
       h += `<div class="row"><span>${name(p)}</span><span><span class="pill ${v}">${v}</span></span><span>`;
@@ -456,7 +503,7 @@ function renderNow(s, snap) {
     h += `</div>`;
   } else if (s.kind === "quest") {
     h = `<h2>Quest ${e.quest} ${e.succeeded ? "succeeds" : `fails with ${e.fails} fail card${e.fails > 1 ? "s" : ""}`}</h2>`;
-    h += `<div class="meta">Team ${listPlayers(e.team)}. Only the number of fail cards is revealed to the table.</div>`;
+    h += `<div class="meta">Team of ${listPlayers(e.team)}. Only the number of fail cards is revealed to the table.</div>`;
     if (god) {
       h += `<div class="rows">` + e.team.map((p) => {
         const c = e.cards[String(p)], why = e.reasoning?.[String(p)];
@@ -464,17 +511,29 @@ function renderNow(s, snap) {
       }).join("") + `</div>`;
     }
   } else if (s.kind === "assassinate") {
-    h = `<h2>${name(e.actor, true)} names P${e.action.target} as Merlin</h2><div class="meta">Good won three quests, so the Assassin gets one guess. A correct guess wins the game for Evil.</div>`;
+    h = `<h2>${name(e.actor, true)} names ${esc(who(e.action.target))} as Merlin</h2><div class="meta">Good won three quests, so the Assassin gets one guess. A correct guess wins the game for Evil.</div>`;
     h += duo(e.private_reasoning, e.public_statement, `P${e.actor}`);
     if (!god) h += `<div class="thinks" style="margin-top:8px"><div class="duo-head">P${e.actor}'s reasoning</div>${esc(e.private_reasoning)}</div>`;
   } else if (s.kind === "end") {
     const r = T.result;
-    h = `<h2>${r.winner === "good" ? "Good wins" : "Evil wins"}</h2><div class="meta">Every role, revealed.</div><div class="rows">`;
-    h += [0, 1, 2, 3, 4].map((p) => `<div class="row"><span>${name(p, true)}</span><span class="${teamOf(p)}-t">${teamOf(p) === "good" ? "Good" : "Evil"}</span><span class="why">${esc(persona(p))}</span></div>`).join("") + `</div>`;
+    h = `<h2>${r.winner === "good" ? "Good wins" : "Evil wins"}</h2><div class="meta">Every role, revealed.</div>`;
+    h += `<div class="cast">` + [0, 1, 2, 3, 4].map((p) => castCard(p, true)).join("") + `</div>`;
     const st = T.stats || {};
     h += `<p class="meta" style="margin-top:12px">${st.proposals ?? "?"} proposals, ${st.llm_calls ?? "?"} model calls, ${st.parse_failures ?? 0} fallbacks${st.duration_s ? `, ${Math.round(st.duration_s / 60)} minutes` : ""}.</p>`;
   }
   $("now").innerHTML = h;
+}
+
+function castCard(p, reveal) {
+  const c = charOf(p), role = roleOf(p), r = ROLE[role];
+  const cls = reveal ? r.team : "";
+  let h = `<div class="cast-card ${cls}">`;
+  h += `<div class="cast-head">${reveal ? emblemSvg(role, 26) : `<span class="emblem-hidden">?</span>`}<div><div class="cast-name">${esc(who(p))}${seatNo(p)}</div>`;
+  h += reveal ? `<div class="cast-role ${r.team}-t">${r.name}: ${r.blurb}</div>` : `<div class="cast-role">Role hidden</div>`;
+  h += `</div></div>`;
+  if (c) h += `<div class="cast-body">${esc(cap(c.temperament))}. <span class="quirk">${esc(c.quirk[0].toUpperCase() + c.quirk.slice(1))}. Plays ${esc(c.playstyle)}.</span></div>`;
+  else h += `<div class="cast-body">${esc(cap(persona(p)))}.</div>`;
+  return h + `</div>`;
 }
 
 function chronicleLine(s) {
@@ -485,11 +544,11 @@ function chronicleLine(s) {
     case "discuss": return `<span class="q">${plainName(e.actor)}:</span> “${esc(short(e.public_statement, 90))}”`;
     case "vote": {
       const yes = Object.values(e.votes).filter((v) => v === "approve").length;
-      const fl = Object.entries(s.flags).map(([p, f]) => `<span class="f">P${p} said ${f}, voted ${e.votes[p]}</span>`).join("; ");
+      const fl = Object.entries(s.flags).map(([p, f]) => `<span class="f">${esc(who(p))} said ${f}, voted ${e.votes[p]}</span>`).join("; ");
       return `Vote ${e.approved ? "approved" : "rejected"} ${yes} to ${5 - yes}${fl ? ". " + fl : ""}`;
     }
     case "quest": return e.succeeded ? `<span class="res-ok">Quest ${e.quest} succeeded</span>` : `<span class="res-fail">Quest ${e.quest} failed</span> (${e.fails} fail)`;
-    case "assassinate": return `Assassin names P${e.action.target} as Merlin`;
+    case "assassinate": return `The Assassin names ${esc(who(e.action.target))} as Merlin`;
     case "end": return `<strong>${T.result.winner === "good" ? "Good wins" : "Evil wins"}</strong>`;
   }
   return s.kind;

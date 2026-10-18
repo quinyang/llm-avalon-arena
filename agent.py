@@ -110,15 +110,17 @@ class LLMAgent:
         self,
         player: int,
         model: str,
-        personality: str,
+        personality: dict | str,
         client,
         word_limit: int = 40,
         max_tokens: int = 700,
         seed: int | None = None,
+        table: str = "",
     ):
         self.player = player
         self.model = model
         self.personality = personality
+        self.table = table  # public roster line, e.g. "P0 Sir Kay, P1 Lady Enid, ..."
         self.client = client
         self.word_limit = word_limit
         self.max_tokens = max_tokens
@@ -126,7 +128,7 @@ class LLMAgent:
 
     def decide(self, public_state: dict, private_state: dict, legal: dict) -> Decision:
         assert private_state["player"] == self.player, "agent got another player's private state"
-        system = system_prompt(private_state, self.personality, self.word_limit)
+        system = system_prompt(private_state, self.personality, self.word_limit, self.table)
         history = None if legal["type"] == "assassinate" else 10  # Assassin sees all table talk
         user = render_state(public_state, self.player, history) + "\n\n" + phase_instruction(public_state, self.player, legal)
         tool = tool_for(legal, self.word_limit)
