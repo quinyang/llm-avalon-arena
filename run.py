@@ -24,7 +24,7 @@ from game import AvalonGame, IllegalAction, Phase
 from prompts import PERSONALITIES
 from roles import ROLES_5P, Team, team_of
 
-PROVIDER_DEFAULT_MODELS = {"anthropic": "claude-haiku-4-5", "asi": "asi1", "fake": "fake"}
+PROVIDER_DEFAULT_MODELS = {"anthropic": "claude-haiku-4-5", "asi": "asi1-fast", "fake": "fake"}
 
 # ANSI colors for the live terminal view
 RESET, DIM, BOLD = "\033[0m", "\033[2m", "\033[1m"
