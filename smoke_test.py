@@ -1,62 +1,48 @@
-"""Hour 0-0.5 check: one model call that returns a schema-valid JSON action.
+"""One real model call per action type, through the same agent code the game uses.
 
-    pip install anthropic
-    export ANTHROPIC_API_KEY=...
-    python smoke_test.py
-
-Uses tool use with a forced tool_choice, so the API returns parsed JSON matching the
-schema instead of free text we have to json.loads. Keep retry + random-legal-action
-fallback in agent.py as a backstop anyway.
+    python smoke_test.py --provider asi          # needs ASI_ONE_API_KEY
+    python smoke_test.py --provider anthropic    # needs ANTHROPIC_API_KEY
 """
 from __future__ import annotations
 
+import argparse
 import json
-import os
 
-import anthropic
-
-MODEL = os.environ.get("AVALON_MODEL", "claude-haiku-4-5")
-
-VOTE_TOOL = {
-    "name": "submit_vote",
-    "description": "Submit your private reasoning and your vote on the proposed team.",
-    "input_schema": {
-        "type": "object",
-        "properties": {
-            "private_reasoning": {"type": "string", "description": "Never shown to other players."},
-            "vote": {"type": "string", "enum": ["approve", "reject"]},
-        },
-        "required": ["private_reasoning", "vote"],
-    },
-}
-
-SYSTEM = (
-    "You are Player 2 in a game of Avalon, a social deduction board game. "
-    "Your secret role: Loyal Servant of Arthur. Your team: GOOD. You have no special information."
-)
-
-STATE = """QUEST HISTORY:  (none yet)
-VOTE HISTORY:   (none yet)
-CURRENT:        Quest 1, needs 2 players, leader P0, rejections this quest: 0
-PROPOSAL:       P0 proposes team [0, 3]
-SCORE:          Good 0 - Evil 0
-Vote on the proposed team."""
+from agent import LLMAgent
+from game import AvalonGame
+from run import PROVIDER_DEFAULT_MODELS, make_client
 
 
 def main() -> None:
-    client = anthropic.Anthropic()
-    resp = client.messages.create(
-        model=MODEL,
-        max_tokens=400,
-        system=SYSTEM,
-        tools=[VOTE_TOOL],
-        tool_choice={"type": "tool", "name": "submit_vote"},
-        messages=[{"role": "user", "content": STATE}],
-    )
-    action = next(b.input for b in resp.content if b.type == "tool_use")
-    assert action["vote"] in ("approve", "reject"), action
-    print(json.dumps(action, indent=2))
-    print(f"model={MODEL} input_tokens={resp.usage.input_tokens} output_tokens={resp.usage.output_tokens}")
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--provider", choices=["anthropic", "asi", "fake"], default="anthropic")
+    ap.add_argument("--model", default=None)
+    args = ap.parse_args()
+    model = args.model or PROVIDER_DEFAULT_MODELS[args.provider]
+    client = make_client(args.provider, seed=0)
+
+    game = AvalonGame(seed=42)
+    leader = game.current_actor()
+    agents = {p: LLMAgent(p, model, "terse and suspicious", client, seed=p) for p in range(5)}
+
+    def show(label, p, d):
+        status = "FALLBACK (model output was invalid twice)" if d.fallback else f"ok (retries={d.retries})"
+        print(f"\n[{label}] P{p} {game.roles[p].value}: {status}")
+        print(json.dumps({"action": d.action, "private_reasoning": d.private_reasoning,
+                          "public_statement": d.public_statement, "error": d.error,
+                          "tokens": [d.input_tokens, d.output_tokens]}, indent=2))
+        return d
+
+    d = show("propose", leader, agents[leader].decide(game.public_state(), game.private_state(leader), game.legal_actions(leader)))
+    game.apply(leader, d.action)
+    speaker = game.current_actor()
+    d = show("discuss", speaker, agents[speaker].decide(game.public_state(), game.private_state(speaker), game.legal_actions(speaker)))
+    game.apply(speaker, d.action)
+    while game.current_phase().value == "discuss":  # skip the rest of the discussion
+        game.apply(game.current_actor(), {"statement": "Seems fine to me."})
+    voter = 0
+    show("vote", voter, agents[voter].decide(game.public_state(), game.private_state(voter), game.legal_actions(voter)))
+    print(f"\nprovider={args.provider} model={model}")
 
 
 if __name__ == "__main__":

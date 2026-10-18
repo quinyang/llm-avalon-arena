@@ -7,7 +7,7 @@ public statement, stored separately. Spec: `PLAN.md`.
 
 | Hours | Block | State |
 |---|---|---|
-| 0–0.5 | API smoke test | Done |
+| 0–0.5 | API smoke test | Anthropic: no credits. **Using Fetch.ai ASI:One** via `openai_compat.py` |
 | 0.5–2.5 | Rules engine + random bots | Done. 11 tests, 1000 random games, 0 violations |
 | 2.5–5 | Agents, prompts, transcripts | Built and tested offline (fake client). **Needs first real game** |
 | 5–7 | `viewer.html` replay | Next |
@@ -17,9 +17,17 @@ public statement, stored separately. Spec: `PLAN.md`.
 ```bash
 python test_game.py                 # rules tests (no deps)
 python test_agents.py               # agent layer vs a fake model (no API spend)
+python test_openai_compat.py        # ASI/OpenAI adapter vs a stub
 python sim.py --games 1000          # random-bot baselines
 
 python run.py --fake                # one offline game printed live: checks plumbing
+
+# ASI:One (Fetch.ai), OpenAI-compatible API
+export ASI_ONE_API_KEY='...'
+python smoke_test.py --provider asi # propose + discuss + vote through the real agent code
+python run.py --provider asi        # one real game, printed live
+export AVALON_PROVIDER=asi          # make asi the default for every command below
+
 python run.py                       # one REAL game printed live (~3-5 min, ~$0.20 on Haiku 4.5)
 python run.py --games 20 --parallel 4 --quiet
 python run.py --role-model assassin=claude-sonnet-4-5 --games 10 --parallel 4
@@ -37,6 +45,7 @@ Transcripts go to `transcripts/` (one JSON per game; `fake_*` files are gitignor
 | `prompts.py` | System prompts, state table rendering, tool schemas |
 | `agent.py` | Forced tool call → validate → retry once → random legal fallback |
 | `run.py` | Game loop, parallel votes/quest cards, live colored output, transcripts |
+| `openai_compat.py` | Adapter: any OpenAI-compatible API (ASI:One, OpenRouter, Groq) behind the same interface |
 | `fake_client.py` | Offline stand-in for the Anthropic client (random, sometimes invalid, tool calls) |
 | `sim.py` | Random-bot driver + invariant checks |
 

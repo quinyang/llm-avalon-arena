@@ -10,12 +10,19 @@ from dataclasses import dataclass, field
 
 from prompts import phase_instruction, render_state, system_prompt, tool_for
 
+API_ERRORS: tuple = ()  # provider errors that mean "give up on this action", not "crash the batch"
 try:
     import anthropic
 
-    API_ERRORS: tuple = (anthropic.APIError,)
-except ImportError:  # lets the fake-client tests run without the SDK installed
-    API_ERRORS = ()
+    API_ERRORS += (anthropic.APIError,)
+except ImportError:  # SDKs are optional; the fake-client tests need neither
+    pass
+try:
+    import openai
+
+    API_ERRORS += (openai.APIError,)
+except ImportError:
+    pass
 
 # USD per million tokens (input, output). Verify against anthropic.com/pricing; unknown models -> cost None.
 PRICES_PER_MTOK = {

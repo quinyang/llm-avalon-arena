@@ -4,6 +4,7 @@
     python run.py                                      # one real game, printed live
     python run.py --games 20 --parallel 4              # batch for the stats
     python run.py --role-model assassin=claude-sonnet-4-5 --games 10
+    python run.py --provider asi                       # Fetch.ai ASI:One (needs ASI_ONE_API_KEY)
 """
 from __future__ import annotations
 
@@ -23,17 +24,20 @@ from game import AvalonGame, IllegalAction, Phase
 from prompts import PERSONALITIES
 from roles import ROLES_5P, Team, team_of
 
-DEFAULT_MODEL = os.environ.get("AVALON_MODEL", "claude-haiku-4-5")
+PROVIDER_DEFAULT_MODELS = {"anthropic": "claude-haiku-4-5", "asi": "asi1", "fake": "fake"}
 
 # ANSI colors for the live terminal view
 RESET, DIM, BOLD = "\033[0m", "\033[2m", "\033[1m"
 GOOD_C, EVIL_C, SYS_C = "\033[94m", "\033[91m", "\033[93m"
 
 
-def make_client(fake: bool, seed: int):
-    if fake:
+def make_client(provider: str, seed: int):
+    if provider == "fake":
         from fake_client import FakeClient
         return FakeClient(seed=seed)
+    if provider == "asi":
+        from openai_compat import OpenAICompatClient
+        return OpenAICompatClient.for_asi()
     import anthropic
     return anthropic.Anthropic(max_retries=6)  # SDK backs off on 429/5xx
 
@@ -178,6 +182,7 @@ def play_game(cfg: dict, client, seed: int, verbose: bool) -> dict:
             "word_limit": cfg["word_limit"],
             "seed": seed,
             "fake": cfg["fake"],
+            "provider": cfg.get("provider"),
         },
         "roles": game.ground_truth()["roles"],
         "events": events,
@@ -201,30 +206,37 @@ def parse_args():
     ap = argparse.ArgumentParser()
     ap.add_argument("--games", type=int, default=1)
     ap.add_argument("--parallel", type=int, default=1, help="games to run concurrently")
-    ap.add_argument("--model", default=DEFAULT_MODEL, help="model for every role")
+    ap.add_argument("--provider", choices=["anthropic", "asi", "fake"],
+                    default=os.environ.get("AVALON_PROVIDER", "anthropic"))
+    ap.add_argument("--model", default=os.environ.get("AVALON_MODEL"),
+                    help="model for every role (default depends on provider)")
     ap.add_argument("--role-model", action="append", default=[], metavar="ROLE=MODEL",
                     help=f"override one role, e.g. assassin=claude-sonnet-4-5. Roles: {[r.value for r in ROLES_5P]}")
     ap.add_argument("--discussion-rounds", type=int, default=1)
     ap.add_argument("--word-limit", type=int, default=40)
     ap.add_argument("--seed", type=int, default=None)
     ap.add_argument("--out", default="transcripts")
-    ap.add_argument("--fake", action="store_true", help="offline fake model, no API calls")
+    ap.add_argument("--fake", action="store_true", help="shortcut for --provider fake (no API calls)")
     ap.add_argument("--quiet", action="store_true")
     return ap.parse_args()
 
 
 def main() -> None:
     args = parse_args()
-    models = {r.value: args.model for r in ROLES_5P}
+    if args.fake:
+        args.provider = "fake"
+    args.fake = args.provider == "fake"
+    model = args.model or PROVIDER_DEFAULT_MODELS[args.provider]
+    models = {r.value: model for r in ROLES_5P}
     for spec in args.role_model:
         role, _, model = spec.partition("=")
         if role not in models or not model:
             raise SystemExit(f"bad --role-model {spec!r}")
         models[role] = model
     cfg = {"models": models, "discussion_rounds": args.discussion_rounds,
-           "word_limit": args.word_limit, "fake": args.fake}
+           "word_limit": args.word_limit, "fake": args.fake, "provider": args.provider}
     base_seed = args.seed if args.seed is not None else random.randrange(10**6)
-    client = make_client(args.fake, base_seed)
+    client = make_client(args.provider, base_seed)
     outdir = Path(args.out)
     outdir.mkdir(parents=True, exist_ok=True)
     verbose = not args.quiet and args.games == 1
