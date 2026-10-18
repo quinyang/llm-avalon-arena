@@ -4,17 +4,16 @@ subset of anthropic.Anthropic that agent.py uses: `client.messages.create(...)` 
     client = OpenAICompatClient.for_asi()      # reads ASI_ONE_API_KEY
 
 Two modes:
-  "tools": send the tool schema with a forced tool_choice (preferred).
+  "tools": send the tool schema with a forced tool_choice (default).
   "json":  send no tools; ask for a bare JSON object in the reply text and parse it.
-The client starts in "tools" mode and switches itself to "json" (sticky) after the model fails to
-return a tool call twice. Force a mode with env AVALON_TOOL_MODE=tools|json.
+In "tools" mode, a reply with no tool call is immediately re-asked ONCE in "json" mode for that call
+only (no global switch). Force a mode with env AVALON_TOOL_MODE=tools|json.
 """
 from __future__ import annotations
 
 import json
 import os
 import re
-import threading
 from types import SimpleNamespace
 
 ASI_BASE_URL = "https://api.asi1.ai/v1"
@@ -118,12 +117,7 @@ class _Messages:
             kwargs["extra_body"] = self.p.extra_body
         return self.p.client.chat.completions.create(**kwargs)
 
-    def create(self, *, model, max_tokens, system, tools, tool_choice, messages):
-        tool = tools[0]
-        required = tool["input_schema"].get("required", [])
-        mode = self.p.mode
-        resp = self._request(model=model, max_tokens=max_tokens, system=system, tools=tools,
-                             tool_choice=tool_choice, messages=messages, mode=mode)
+    def _blocks(self, resp, tool, required):
         msg = resp.choices[0].message
         blocks = []
         if msg.content:
@@ -138,16 +132,44 @@ class _Messages:
             if obj is not None:
                 blocks.append(SimpleNamespace(type="tool_use", id="call_text", name=tool["name"],
                                               input=obj, from_text=True))
-            elif mode == "tools":
-                self.p.note_tool_failure()
-        usage = getattr(resp, "usage", None)
+        return blocks
+
+    def create(self, *, model, max_tokens, system, tools, tool_choice, messages):
+        tool = tools[0]
+        required = tool["input_schema"].get("required", [])
+        args = dict(model=model, max_tokens=max_tokens, system=system, tools=tools,
+                    tool_choice=tool_choice, messages=messages)
+        resp = self._request(**args, mode=self.p.mode)
+        blocks = self._blocks(resp, tool, required)
+        n_in, n_out = self._usage(resp)
+        finish = resp.choices[0].finish_reason
+        self._log(self.p.mode, resp)
+        if self.p.mode == "tools" and not any(b.type == "tool_use" for b in blocks):
+            # One immediate rescue attempt for this call only, asking for JSON in the text.
+            self.p.rescues += 1
+            resp2 = self._request(**args, mode="json")
+            self._log("json-rescue", resp2)
+            blocks2 = self._blocks(resp2, tool, required)
+            a, b = self._usage(resp2)
+            n_in, n_out = n_in + a, n_out + b
+            if any(x.type == "tool_use" for x in blocks2):
+                self.p.rescued += 1
+                blocks = blocks2
+            finish = f"{finish}; rescue={resp2.choices[0].finish_reason}"
+        return SimpleNamespace(content=blocks, stop_reason=finish,
+                               usage=SimpleNamespace(input_tokens=n_in, output_tokens=n_out))
+
+    @staticmethod
+    def _usage(resp):
+        u = getattr(resp, "usage", None)
+        return (getattr(u, "prompt_tokens", 0) or 0), (getattr(u, "completion_tokens", 0) or 0)
+
+    def _log(self, mode, resp):
         if self.p.debug:
-            print(f"[openai_compat] mode={mode} finish={resp.choices[0].finish_reason} "
-                  f"tool_calls={len(msg.tool_calls or [])} content={str(msg.content)[:300]!r}")
-        return SimpleNamespace(content=blocks, usage=SimpleNamespace(
-            input_tokens=getattr(usage, "prompt_tokens", 0) or 0,
-            output_tokens=getattr(usage, "completion_tokens", 0) or 0,
-        ))
+            c = resp.choices[0]
+            print(f"[openai_compat] mode={mode} finish={c.finish_reason} "
+                  f"tool_calls={len(c.message.tool_calls or [])} usage={self._usage(resp)} "
+                  f"content={str(c.message.content)[:200]!r}")
 
 
 class OpenAICompatClient:
@@ -157,19 +179,11 @@ class OpenAICompatClient:
         self.temperature = temperature
         self.extra_body = extra_body
         self.mode = mode or os.environ.get("AVALON_TOOL_MODE", "tools")
-        self.auto_switch = os.environ.get("AVALON_TOOL_MODE") is None and mode is None
         self.min_max_tokens = min_max_tokens
         self.debug = debug or bool(os.environ.get("AVALON_DEBUG"))
-        self._tool_failures = 0
-        self._lock = threading.Lock()
+        self.rescues = 0   # tool-mode replies with no tool call
+        self.rescued = 0   # of those, fixed by the JSON re-ask
         self.messages = _Messages(self)
-
-    def note_tool_failure(self) -> None:
-        with self._lock:
-            self._tool_failures += 1
-            if self.auto_switch and self.mode == "tools" and self._tool_failures >= 2:
-                self.mode = "json"
-                print("[openai_compat] model is not returning tool calls; switching to JSON-in-text mode")
 
     @classmethod
     def for_asi(cls, api_key: str | None = None) -> "OpenAICompatClient":
@@ -178,7 +192,8 @@ class OpenAICompatClient:
         key = api_key or os.environ.get("ASI_ONE_API_KEY")
         if not key:
             raise SystemExit("Set ASI_ONE_API_KEY (create one at asi1.ai under your profile / API keys).")
-        client = OpenAI(api_key=key, base_url=ASI_BASE_URL, max_retries=3, timeout=60)
+        client = OpenAI(api_key=key, base_url=ASI_BASE_URL, max_retries=3, timeout=180)
         # The documented "web_search" extra field is rejected (400) by the live API, so none is sent.
-        # ASI models may emit long reasoning text; give them room so the answer isn't truncated.
-        return cls(client, min_max_tokens=2000)
+        # ASI spends ~1-3k output tokens on hidden reasoning before answering; a low cap truncates
+        # the answer (no tool call). You only pay for tokens actually generated.
+        return cls(client, min_max_tokens=8000)

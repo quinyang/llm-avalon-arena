@@ -14,7 +14,8 @@ def _resp(tool_args=None, content=None, name="propose_team"):
     if tool_args is not None:
         calls = [SimpleNamespace(id="call_1", function=SimpleNamespace(name=name, arguments=tool_args))]
     msg = SimpleNamespace(content=content, tool_calls=calls)
-    return SimpleNamespace(choices=[SimpleNamespace(message=msg)],
+    finish = "tool_calls" if calls else "stop"
+    return SimpleNamespace(choices=[SimpleNamespace(message=msg, finish_reason=finish)],
                            usage=SimpleNamespace(prompt_tokens=100, completion_tokens=20))
 
 
@@ -70,25 +71,27 @@ def test_json_in_text_when_tool_ignored():
 
 def test_garbage_falls_back_to_random_legal():
     g, p = _leader_setup()
-    stub = StubOpenAI([_resp("not json"), _resp(None, content="I refuse")])
+    refuse = _resp(None, content="I refuse")
+    stub = StubOpenAI([refuse] * 4)  # 2 agent attempts x (tool try + json rescue)
     d = LLMAgent(p, "asi1", "terse", OpenAICompatClient(stub)).decide(g.public_state(), g.private_state(p), g.legal_actions(p))
-    assert d.fallback and d.calls == 2
+    assert d.fallback and d.calls == 2 and len(stub.requests) == 4 and "stop_reason" in d.error
     g.apply(p, d.action)
 
 
-def test_auto_switch_to_json_mode():
+def test_per_call_json_rescue_no_global_switch():
     g, p = _leader_setup()
     prose = _resp(None, content="Let me think about this carefully... " * 50)
     good_text = _resp(None, content='<think>hmm {not json}</think> {"private_reasoning": "r", "public_statement": "s", "team": [1, 2]}')
-    stub = StubOpenAI([prose, prose, good_text])
+    good_tool = _resp(json.dumps({"private_reasoning": "r", "public_statement": "s", "team": [3, 4]}))
+    stub = StubOpenAI([prose, good_text, good_tool])
     client = OpenAICompatClient(stub)
     agent = LLMAgent(p, "asi1", "terse", client)
     d1 = agent.decide(g.public_state(), g.private_state(p), g.legal_actions(p))
-    assert d1.fallback and client.mode == "json"           # two tool-less replies -> switch
+    assert not d1.fallback and d1.action["team"] == [1, 2] and d1.calls == 1   # rescued inside one call
+    assert "tools" not in stub.requests[1] and "OUTPUT FORMAT" in stub.requests[1]["messages"][0]["content"]
+    assert client.mode == "tools" and client.rescues == 1 and client.rescued == 1
     d2 = agent.decide(g.public_state(), g.private_state(p), g.legal_actions(p))
-    assert not d2.fallback and d2.action["team"] == [1, 2]
-    req = stub.requests[2]
-    assert "tools" not in req and "OUTPUT FORMAT" in req["messages"][0]["content"]
+    assert "tools" in stub.requests[2] and d2.action["team"] == [3, 4]          # still tools mode
 
 
 def test_extract_prefers_object_with_required_keys():

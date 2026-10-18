@@ -263,6 +263,11 @@ def main() -> None:
     print(f"\n{len(results)} games: good {winners['good']}, evil {winners['evil']}. "
           f"Merlin survived {survived} of {len(assassinations)} assassinations. "
           f"Total cost: {'$%.3f' % sum(costs) if None not in costs else 'unknown (model not in price table)'}")
+    if hasattr(client, "rescues"):
+        fb = sum(t["stats"]["parse_failures"] for t in results)
+        calls = sum(t["stats"]["llm_calls"] for t in results)
+        print(f"Format health: {fb} fallbacks / {calls} calls; "
+              f"{client.rescues} replies lacked a tool call, {client.rescued} fixed by JSON re-ask.")
 
 
 if __name__ == "__main__":

@@ -152,7 +152,7 @@ class LLMAgent:
             block = next((b for b in resp.content if getattr(b, "type", None) == "tool_use"), None)
             try:
                 if block is None:
-                    raise ValueError("no tool call in response")
+                    raise ValueError(f"no tool call in response (stop_reason={getattr(resp, 'stop_reason', None)})")
                 d.action, d.private_reasoning, d.public_statement = parse_tool_input(legal, block.input, self.word_limit)
                 d.retries = attempt
                 return d
