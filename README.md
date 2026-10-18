@@ -49,6 +49,15 @@ roles and every private thought next to what was said out loud. Space plays/paus
 during each game (disable with `--no-live`). Purple dots and "said X, voted Y" notes mark players whose vote
 contradicted what they said. You can also drag a transcript file onto the page without the server.
 
+## Results
+
+```bash
+python analyze.py        # reads transcripts/, writes analysis/summary.md, stats.json, summary.png
+```
+
+Headline numbers, a per-role table (rejecting Evil teams, said-vs-voted contradictions) and a two-panel
+chart. Re-run after every batch.
+
 ## Characters
 
 Every game deals each seat a random character (`prompts.make_characters`): an Arthurian name, a temperament,
@@ -68,6 +77,7 @@ each transcript and shown in the viewer, with role emblems when secrets are on.
 | `openai_compat.py` | Adapter: any OpenAI-compatible API (ASI:One, OpenRouter, Groq) behind the same interface |
 | `fake_client.py` | Offline stand-in for the Anthropic client (random, sometimes invalid, tool calls) |
 | `sim.py` | Random-bot driver + invariant checks |
+| `analyze.py` | Stats + chart from all finished transcripts |
 | `viewer.html` | Round-table replay and live view: tracks, votes, quest cards, thoughts vs speech |
 
 ## Design notes

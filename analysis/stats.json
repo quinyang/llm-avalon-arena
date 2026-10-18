@@ -1,0 +1,204 @@
+{
+  "games": 6,
+  "files": [
+    "20261017-182845_bf161d62.json",
+    "20261017-185218_8fbc63db.json",
+    "20261017-190733_b16b0a6c.json",
+    "20261017-191130_c66db9d8.json",
+    "20261017-192423_7669852d.json",
+    "20261017-192535_edb98e0f.json"
+  ],
+  "winners": {
+    "evil": 5,
+    "good": 1
+  },
+  "end_reasons": {
+    "merlin_assassinated": 5,
+    "three_quests_succeeded": 1
+  },
+  "merlin": {
+    "assassinations": 6,
+    "survived": 1,
+    "survival": {
+      "k": 1,
+      "n": 6,
+      "rate": 0.16666666666666666,
+      "ci95": [
+        0.03005258587173032,
+        0.563509436563646
+      ]
+    },
+    "random_baseline": 0.75
+  },
+  "evil_fail_rate": {
+    "k": 2,
+    "n": 11,
+    "rate": 0.18181818181818182,
+    "ci95": [
+      0.05136660067100063,
+      0.4769861375782448
+    ]
+  },
+  "reject_rate_teams_with_evil": {
+    "merlin": {
+      "k": 13,
+      "n": 14,
+      "rate": 0.9285714285714286,
+      "ci95": [
+        0.6853073044604219,
+        0.9872781138877085
+      ]
+    },
+    "percival": {
+      "k": 6,
+      "n": 14,
+      "rate": 0.42857142857142855,
+      "ci95": [
+        0.21380509930400526,
+        0.6740973309713064
+      ]
+    },
+    "loyal_servant": {
+      "k": 5,
+      "n": 14,
+      "rate": 0.35714285714285715,
+      "ci95": [
+        0.16344490737202735,
+        0.6123599531785959
+      ]
+    },
+    "morgana": {
+      "k": 2,
+      "n": 14,
+      "rate": 0.14285714285714285,
+      "ci95": [
+        0.040093073737921175,
+        0.39941907763863693
+      ]
+    },
+    "assassin": {
+      "k": 4,
+      "n": 14,
+      "rate": 0.2857142857142857,
+      "ci95": [
+        0.11721187910109099,
+        0.5464954117248438
+      ]
+    }
+  },
+  "reject_rate_all_good_teams": {
+    "merlin": {
+      "k": 0,
+      "n": 10,
+      "rate": 0.0,
+      "ci95": [
+        0.0,
+        0.2775401687666166
+      ]
+    },
+    "percival": {
+      "k": 1,
+      "n": 10,
+      "rate": 0.1,
+      "ci95": [
+        0.01787574951572113,
+        0.4041563854975721
+      ]
+    },
+    "loyal_servant": {
+      "k": 1,
+      "n": 10,
+      "rate": 0.1,
+      "ci95": [
+        0.01787574951572113,
+        0.4041563854975721
+      ]
+    },
+    "morgana": {
+      "k": 2,
+      "n": 10,
+      "rate": 0.2,
+      "ci95": [
+        0.056680947980693314,
+        0.5098431532792765
+      ]
+    },
+    "assassin": {
+      "k": 6,
+      "n": 10,
+      "rate": 0.6,
+      "ci95": [
+        0.3126695474501864,
+        0.8318224187964902
+      ]
+    }
+  },
+  "said_vs_voted_contradictions": {
+    "merlin": {
+      "k": 2,
+      "n": 11,
+      "rate": 0.18181818181818182,
+      "ci95": [
+        0.05136660067100063,
+        0.4769861375782448
+      ]
+    },
+    "percival": {
+      "k": 4,
+      "n": 14,
+      "rate": 0.2857142857142857,
+      "ci95": [
+        0.11721187910109099,
+        0.5464954117248438
+      ]
+    },
+    "loyal_servant": {
+      "k": 0,
+      "n": 17,
+      "rate": 0.0,
+      "ci95": [
+        0.0,
+        0.18432366037156456
+      ]
+    },
+    "morgana": {
+      "k": 2,
+      "n": 15,
+      "rate": 0.13333333333333333,
+      "ci95": [
+        0.0373604698913593,
+        0.3788249920651624
+      ]
+    },
+    "assassin": {
+      "k": 1,
+      "n": 14,
+      "rate": 0.07142857142857142,
+      "ci95": [
+        0.012721886112291636,
+        0.3146926955395781
+      ]
+    }
+  },
+  "contradiction_examples": [
+    "Assassin (P0) said \u201cP3 skipped both me and P1. Convenient. Reject.\u201d then voted approve",
+    "Percival (P2) said \u201cP3's proposal has all the vision of a mid-tier merger. I'll approve, but I'm billing overtime if this quest goes south.\u201d then voted reject",
+    "Percival (P2) said \u201cAnother pitch with P0 and me. Derivative, but the risk-reward works\u2014he flinches, we get intel. Approved.\u201d then voted reject",
+    "Merlin (P2) said \u201cOne clean quest doesn't clear anyone. P0 backed P4's self-pick last round, and now we're expanding that same core? I don't know, I just... I think I need to reject this. We need more diverse data points before I feel...\u201d then voted approve",
+    "Morgana (P2) said \u201cI backed Q2.2 for intel, not trust. We got our fail. P0 and I are untouched. Rejecting fresh blood to recycle suspects? Evil's playbook.\u201d then voted approve",
+    "Merlin (P3) said \u201cP0, you claimed clean last round. Now rejecting your own spot? P2's first-ever rejection conveniently lands when neither P2 nor P4 are on the team. Chuckle.\u201d then voted approve",
+    "Percival (P3) said \u201cP1, your pitch is 'we had one good quarter, so now we're hiring.' Zero due diligence on P2 beyond polite enthusiasm. I'll approve, but I'm auditing this ledger.\u201d then voted reject",
+    "Percival (P3) said \u201c'Unproven' is a polite way to say ' we're all suspects,' but 50/50 is better than stuck. Let's go. No over analysis needed.\u201d then voted reject"
+  ],
+  "per_game_avg": {
+    "proposals": 4.0,
+    "rejections": 0.67,
+    "calls": 50.5,
+    "fallbacks": 0.33,
+    "seconds": 1535.65
+  },
+  "format_health": {
+    "fallbacks": 2,
+    "calls": 303
+  }
+}
