@@ -76,8 +76,15 @@ def safe_apply(game: AvalonGame, p: int, d: Decision, legal: dict, rng: random.R
         return game.apply(p, d.action)
 
 
-def play_game(cfg: dict, client, seed: int, verbose: bool) -> dict:
+def _atomic_write(path: Path, data: dict) -> None:
+    tmp = path.with_suffix(".tmp")
+    tmp.write_text(json.dumps(data, indent=2))
+    os.replace(tmp, path)  # readers never see a half-written file
+
+
+def play_game(cfg: dict, client, seed: int, verbose: bool, live_path: Path | None = None) -> dict:
     t0 = time.time()
+    game_id = str(uuid.uuid4())
     rng = random.Random(seed)
     game = AvalonGame(seed=seed, discussion_rounds=cfg["discussion_rounds"], first_leader=rng.randrange(5))
     personalities = rng.sample(PERSONALITIES, game.n)
@@ -89,6 +96,31 @@ def play_game(cfg: dict, client, seed: int, verbose: bool) -> dict:
     out = Printer(game, verbose)
     events: list[dict] = []
     decisions: list[Decision] = []
+    meta = {
+        "game_id": game_id,
+        "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "config": {
+            "models": cfg["models"],
+            "seat_models": {str(p): m for p, m in seat_models.items()},
+            "personalities": {str(p): s for p, s in enumerate(personalities)},
+            "discussion_rounds": cfg["discussion_rounds"],
+            "word_limit": cfg["word_limit"],
+            "seed": seed,
+            "fake": cfg["fake"],
+            "provider": cfg.get("provider"),
+        },
+        "roles": game.ground_truth()["roles"],
+    }
+
+    def emit_live(pending: list[int]) -> None:
+        """Partial transcript for the viewer's Follow live mode."""
+        if live_path is None:
+            return
+        try:
+            _atomic_write(live_path, {**meta, "live": True, "events": events, "result": None,
+                                      "stats": {}, "pending": pending})
+        except OSError:
+            pass  # live view is best-effort; never kill a game over it
 
     def decide(p: int, pub: dict) -> Decision:
         legal = game.legal_actions(p)
@@ -102,6 +134,7 @@ def play_game(cfg: dict, client, seed: int, verbose: bool) -> dict:
             phase = game.current_phase()
             pub = game.public_state()
 
+            emit_live(game.pending_actors())
             if phase in (Phase.VOTE, Phase.QUEST):
                 # Simultaneous: everyone decides from the same snapshot, then we apply.
                 actors = game.pending_actors()
@@ -172,19 +205,7 @@ def play_game(cfg: dict, client, seed: int, verbose: bool) -> dict:
     tok_out = sum(d.output_tokens for d in decisions)
     costs = [cost_usd(d.model, d.input_tokens, d.output_tokens) for d in decisions if d.model]
     return {
-        "game_id": str(uuid.uuid4()),
-        "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "config": {
-            "models": cfg["models"],
-            "seat_models": {str(p): m for p, m in seat_models.items()},
-            "personalities": {str(p): s for p, s in enumerate(personalities)},
-            "discussion_rounds": cfg["discussion_rounds"],
-            "word_limit": cfg["word_limit"],
-            "seed": seed,
-            "fake": cfg["fake"],
-            "provider": cfg.get("provider"),
-        },
-        "roles": game.ground_truth()["roles"],
+        **meta,
         "events": events,
         "result": res,
         "stats": {
@@ -218,6 +239,7 @@ def parse_args():
     ap.add_argument("--out", default="transcripts")
     ap.add_argument("--fake", action="store_true", help="shortcut for --provider fake (no API calls)")
     ap.add_argument("--quiet", action="store_true")
+    ap.add_argument("--no-live", action="store_true", help="don't write live_*.json files for the viewer")
     return ap.parse_args()
 
 
@@ -242,11 +264,14 @@ def main() -> None:
     verbose = not args.quiet and args.games == 1
 
     def one(i: int) -> dict:
-        tr = play_game(cfg, client, base_seed + i, verbose)
-        stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
         prefix = "fake_" if args.fake else ""
+        live = None if args.no_live else outdir / f"{prefix}live_{base_seed + i}.json"
+        tr = play_game(cfg, client, base_seed + i, verbose, live_path=live)
+        stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
         path = outdir / f"{prefix}{stamp}_{tr['game_id'][:8]}.json"
-        path.write_text(json.dumps(tr, indent=2))
+        _atomic_write(path, tr)
+        if live is not None:
+            live.unlink(missing_ok=True)  # finished: the viewer switches to the final file
         r, s = tr["result"], tr["stats"]
         print(f"[game {i + 1}/{args.games}] {r['winner']:>4} via {r['reason']:<24} "
               f"proposals={s['proposals']} calls={s['llm_calls']} cost=${s['cost_usd']} "

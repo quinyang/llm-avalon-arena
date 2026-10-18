@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Avalon Arena</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,600;0,700;1,400;1,500&family=Alegreya+Sans:wght@400;500;700&family=Alegreya+SC:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --hall: #151b26;
+  --hall-2: #1d2534;
+  --hall-3: #273146;
+  --rule: #34405a;
+  --oak: #4a2f1c;
+  --oak-hi: #6b4528;
+  --felt: #24402f;
+  --felt-hi: #2e5240;
+  --parchment: #eadfc4;
+  --parchment-2: #ddcfae;
+  --ink: #2a2118;
+  --gold: #c8a04a;
+  --gold-hi: #e2c06d;
+  --good: #4a7bc0;
+  --evil: #b0383f;
+  --thought: #a79fd2;
+  --text: #e6e1d6;
+  --muted: #98a2b4;
+  --serif: "Alegreya", Georgia, serif;
+  --sans: "Alegreya Sans", system-ui, sans-serif;
+  --sc: "Alegreya SC", "Alegreya", Georgia, serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--hall);
+  color: var(--text);
+  font: 16px/1.5 var(--sans);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100vh;
+}
+button, select, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--gold-hi); outline-offset: 2px; }
+
+/* ------------------------------------------------------------ top bar */
+header {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px;
+  padding: 12px 20px; border-bottom: 1px solid var(--rule); background: var(--hall-2);
+}
+header h1 { font: 700 26px/1 var(--sc); margin: 0; color: var(--gold); letter-spacing: .01em; }
+.tracks { display: flex; gap: 22px; align-items: center; margin-left: auto; flex-wrap: wrap; }
+.track { display: flex; align-items: center; gap: 8px; }
+.track-name { color: var(--muted); font-size: 14px; }
+.quest-pip {
+  width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+  border: 2px solid var(--rule); font: 700 14px/1 var(--sans); font-variant-numeric: lining-nums; color: var(--muted);
+}
+.quest-pip.current-q { border-color: var(--gold); color: var(--gold-hi); }
+.quest-pip.ok { background: var(--good); border-color: var(--good); color: #fff; }
+.quest-pip.fail { background: var(--evil); border-color: var(--evil); color: #fff; }
+.rej-pip { width: 12px; height: 12px; border-radius: 3px; border: 1.5px solid var(--rule); }
+.rej-pip.on { background: var(--gold); border-color: var(--gold); }
+.rej-pip:last-child { border-color: var(--evil); }
+.rej-pip:last-child.on { background: var(--evil); }
+.controls-top { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; min-width: 0; }
+#picker { max-width: 100%; min-width: 0; }
+select, .btn {
+  background: var(--hall-3); border: 1px solid var(--rule); border-radius: 6px; padding: 6px 10px;
+}
+.btn { cursor: pointer; }
+.btn:hover { border-color: var(--muted); }
+.btn.secret[aria-pressed="true"] { background: var(--thought); color: var(--hall); border-color: var(--thought); font-weight: 700; }
+label.check { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 14px; }
+
+/* ------------------------------------------------------------ main layout */
+main {
+  display: grid; min-height: 0;
+  grid-template-columns: minmax(400px, 1.1fr) minmax(0, 1fr) minmax(280px, .8fr);
+  grid-template-areas: "stage now log";
+}
+.stage-col { grid-area: stage; display: flex; align-items: center; justify-content: center; min-height: 0; min-width: 0; border-right: 1px solid var(--rule); padding: 8px; }
+.stage { position: relative; flex: 0 0 auto; width: min(100%, calc(100vh - 150px), 600px); aspect-ratio: 1; }
+.stage svg { width: 100%; height: 100%; display: block; }
+.center {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: 40%; text-align: center; pointer-events: none;
+}
+.center .caption { font: 600 17px/1.25 var(--serif); color: var(--parchment); }
+.center .sub { font-size: 14px; color: #b9c9bb; margin-top: 2px; }
+.cards { display: flex; gap: 6px; justify-content: center; margin-top: 10px; perspective: 600px; }
+.card {
+  width: 30px; height: 44px; border-radius: 4px; position: relative; transform-style: preserve-3d;
+  animation: flip .55s ease-out both;
+}
+.card .face { position: absolute; inset: 0; border-radius: 4px; backface-visibility: hidden; }
+.card .back { background: repeating-linear-gradient(45deg, var(--oak) 0 4px, var(--oak-hi) 4px 8px); border: 1px solid var(--gold); }
+.card .front { transform: rotateY(180deg); display: grid; place-items: center; font: 700 16px var(--serif); color: #fff; border: 1px solid rgba(255,255,255,.5); }
+.card.ok .front { background: var(--good); }
+.card.fail .front { background: var(--evil); }
+@keyframes flip { from { transform: rotateY(0); } to { transform: rotateY(180deg); } }
+
+/* seats (SVG) */
+.seat-ring { fill: var(--hall-3); stroke: #586480; stroke-width: 3; }
+.seat.good .seat-ring { stroke: var(--good); }
+.seat.evil .seat-ring { stroke: var(--evil); }
+.seat.speaking .seat-ring { stroke: var(--gold-hi); stroke-width: 5; filter: url(#glow); }
+.seat-label { font: 700 22px var(--serif); font-variant-numeric: lining-nums; fill: var(--text); text-anchor: middle; dominant-baseline: central; }
+.seat-role { font: 500 15px var(--sans); text-anchor: middle; fill: var(--muted); }
+.seat.good .seat-role { fill: #8fb3e6; }
+.seat.evil .seat-role { fill: #e48990; }
+.team-token { fill: var(--gold); stroke: #7a5f22; stroke-width: 2; }
+.vote-token.approve { fill: var(--parchment); stroke: var(--gold); stroke-width: 2; }
+.vote-token.reject { fill: #20140e; stroke: #8a6a55; stroke-width: 2; }
+.vote-mark { font: 700 16px var(--sans); text-anchor: middle; dominant-baseline: central; }
+.vote-mark.approve { fill: var(--ink); }
+.vote-mark.reject { fill: #d8c3b4; }
+.flag-dot { fill: var(--thought); stroke: var(--hall); stroke-width: 2; }
+.crown { fill: var(--gold); stroke: #7a5f22; stroke-width: 1; }
+.target-ring { fill: none; stroke: var(--evil); stroke-width: 3; stroke-dasharray: 6 5; }
+.thinking { font: italic 14px var(--serif); fill: var(--thought); text-anchor: middle; }
+
+/* now panel */
+.now { grid-area: now; padding: 18px 20px; overflow: auto; min-height: 0; border-right: 1px solid var(--rule); }
+.now h2 { font: 600 20px/1.3 var(--serif); margin: 0 0 4px; color: var(--parchment); }
+.now .meta { color: var(--muted); font-size: 14px; margin-bottom: 10px; }
+.duo { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.duo.single { grid-template-columns: 1fr; }
+.thinks, .says { border-radius: 8px; padding: 10px 14px; font: 17px/1.5 var(--serif); }
+.thinks { border: 1.5px dashed var(--thought); color: #d7d2ee; font-style: italic; }
+.says { background: var(--parchment); color: var(--ink); box-shadow: inset 0 0 0 1px var(--parchment-2); }
+.duo-head { font: 500 14px var(--sans); margin-bottom: 4px; }
+.thinks .duo-head { color: var(--thought); font-style: normal; }
+.says .duo-head { color: #6f5a3e; }
+.rows { display: grid; gap: 6px; }
+.row { display: grid; grid-template-columns: 9.5em 5.5em 1fr; gap: 10px; align-items: start; padding: 6px 0; border-bottom: 1px solid var(--rule); font-size: 15px; }
+.row:last-child { border-bottom: 0; }
+.row .why { color: #cfcae6; font: italic 15px/1.45 var(--serif); }
+.pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 13px; font-weight: 700; }
+.pill.approve, .pill.success { background: var(--parchment); color: var(--ink); }
+.pill.reject { background: #3a2a22; color: #e3cfc2; }
+.pill.fail { background: var(--evil); color: #fff; }
+.flag { color: var(--thought); font-size: 14px; display: block; margin-top: 2px; }
+.good-t { color: #8fb3e6; } .evil-t { color: #e48990; }
+.empty { color: var(--muted); max-width: 46ch; }
+.empty code { background: var(--hall-3); padding: 1px 6px; border-radius: 4px; color: var(--text); }
+
+/* chronicle */
+.chronicle { grid-area: log; overflow: auto; min-height: 0; padding: 14px 18px 24px; }
+.chronicle h3 { font: 600 15px var(--sans); color: var(--muted); margin: 14px 0 6px; }
+.chronicle h3:first-child { margin-top: 0; }
+.entry { display: block; width: 100%; text-align: left; background: none; border: 0; border-left: 3px solid transparent; padding: 5px 10px; cursor: pointer; color: var(--text); font-size: 15px; line-height: 1.4; border-radius: 0 4px 4px 0; }
+.entry:hover { background: var(--hall-2); }
+.entry.current { border-left-color: var(--gold); background: var(--hall-2); }
+.entry.future { display: none; }
+.entry .q { font-family: var(--serif); color: #d9cfb7; }
+.entry .f { color: var(--thought); }
+.entry .res-ok { color: #8fb3e6; font-weight: 700; } .entry .res-fail { color: #e48990; font-weight: 700; }
+
+/* transport */
+footer {
+  display: flex; align-items: center; gap: 10px; padding: 10px 20px; border-top: 1px solid var(--rule);
+  background: var(--hall-2); flex-wrap: wrap;
+}
+footer .btn { min-width: 40px; }
+#play { min-width: 76px; font-weight: 700; }
+#scrub { flex: 1; min-width: 160px; accent-color: var(--gold); }
+#stepinfo { color: var(--muted); font-size: 14px; min-width: 7.5em; text-align: right; }
+.banner {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 62%;
+  background: var(--parchment); color: var(--ink); border-radius: 10px; padding: 16px 18px; text-align: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,.55); border: 2px solid var(--gold);
+}
+.banner .w { font: 700 28px/1.1 var(--sc); }
+.banner .w.good { color: #2d5a99; } .banner .w.evil { color: #8f262d; }
+.banner p { margin: 6px 0 0; font: 16px/1.4 var(--serif); }
+.drop-hint { position: fixed; inset: 0; display: none; place-items: center; background: rgba(21,27,38,.85); font: 600 24px var(--serif); color: var(--gold-hi); z-index: 10; border: 3px dashed var(--gold); }
+body.dragging .drop-hint { display: grid; }
+
+@media (max-width: 1250px) {
+  main { grid-template-columns: minmax(0, 1.2fr) minmax(280px, 1fr); grid-template-rows: auto minmax(0, 1fr); grid-template-areas: "stage log" "now log"; }
+  .stage { width: min(100%, calc(55vh), 520px); }
+  .now { border-right: 1px solid var(--rule); border-top: 1px solid var(--rule); }
+  .duo { grid-template-columns: 1fr 1fr; }
+  .duo.single { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+  body { display: block; height: auto; }
+  main { display: block; }
+  .stage-col { border-right: 0; }
+  .stage { width: min(100%, 520px); }
+  .now { border: 0; border-top: 1px solid var(--rule); }
+  .chronicle { border-top: 1px solid var(--rule); max-height: 60vh; }
+  .duo { grid-template-columns: 1fr; }
+  .row { grid-template-columns: 7em 5em 1fr; }
+  .tracks { margin-left: 0; }
+  footer { position: sticky; bottom: 0; z-index: 5; padding: 8px 12px; }
+  #scrub { order: 10; flex-basis: 100%; }
+  .banner { width: 80%; }
+  .banner .w { font-size: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card { animation: none; transform: rotateY(180deg); }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Avalon Arena</h1>
+  <div class="controls-top">
+    <select id="picker" aria-label="Choose a saved game"><option value="">Loading games…</option></select>
+    <label class="btn" for="file">Open file</label>
+    <input id="file" type="file" accept=".json,application/json" hidden>
+    <button class="btn secret" id="god" aria-pressed="false" title="Shortcut: S">Show secrets</button>
+    <label class="check"><input type="checkbox" id="follow"> Follow live</label>
+  </div>
+  <div class="tracks" aria-label="Game progress">
+    <div class="track"><span class="track-name">Quests</span><span id="questTrack" style="display:flex;gap:6px"></span></div>
+    <div class="track"><span class="track-name">Rejected teams</span><span id="rejTrack" style="display:flex;gap:4px"></span></div>
+  </div>
+</header>
+
+<main>
+  <section class="stage-col">
+    <div class="stage" id="stage">
+      <svg viewBox="0 0 640 640" id="board" role="img" aria-label="The round table">
+        <defs>
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <radialGradient id="feltGrad" cx="50%" cy="45%" r="60%">
+            <stop offset="0%" stop-color="var(--felt-hi)"/><stop offset="100%" stop-color="var(--felt)"/>
+          </radialGradient>
+        </defs>
+        <circle cx="320" cy="320" r="182" fill="var(--oak)" stroke="var(--oak-hi)" stroke-width="3"/>
+        <circle cx="320" cy="320" r="158" fill="url(#feltGrad)"/>
+        <g id="layer-tokens"></g>
+        <g id="layer-seats"></g>
+      </svg>
+      <div class="center" id="center"></div>
+      <div id="bannerSlot"></div>
+    </div>
+  </section>
+  <section class="now" id="now" aria-live="polite"></section>
+  <aside class="chronicle" id="chronicle" aria-label="Game log"></aside>
+</main>
+
+<footer>
+  <button class="btn" id="first" title="Start (Home)" aria-label="Go to start">⏮</button>
+  <button class="btn" id="prev" title="Back (←)" aria-label="Step back">◀</button>
+  <button class="btn" id="play" title="Play or pause (Space)">Play</button>
+  <button class="btn" id="next" title="Forward (→)" aria-label="Step forward">▶</button>
+  <button class="btn" id="last" title="End (End)" aria-label="Go to end">⏭</button>
+  <input type="range" id="scrub" min="0" max="0" value="0" aria-label="Scrub through the game">
+  <select id="speed" aria-label="Playback speed">
+    <option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option>
+  </select>
+  <span id="stepinfo"></span>
+</footer>
+<div class="drop-hint">Drop a transcript to watch it</div>
+
+<script>
+"use strict";
+const ROLE = {
+  merlin: { name: "Merlin", team: "good" },
+  percival: { name: "Percival", team: "good" },
+  loyal_servant: { name: "Loyal Servant", team: "good" },
+  morgana: { name: "Morgana", team: "evil" },
+  assassin: { name: "Assassin", team: "evil" },
+};
+const SIZES = [2, 3, 2, 3, 3];
+const C = 320, R_SEAT = 244, R_TEAM = 128, R_VOTE = 194;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+let T = null, steps = [], idx = 0, god = false, playing = false, timer = null, sourceUrl = null;
+
+/* ------------------------------------------------------------ helpers */
+const roleOf = (p) => T.roles[String(p)];
+const teamOf = (p) => ROLE[roleOf(p)]?.team;
+const seatXY = (p, r) => { const a = (-90 + p * 72) * Math.PI / 180; return [C + r * Math.cos(a), C + r * Math.sin(a)]; };
+const name = (p, forceRole) => (god || forceRole) ? `P${p} <span class="${teamOf(p)}-t">${ROLE[roleOf(p)].name}</span>` : `P${p}`;
+const plainName = (p) => god ? `P${p} (${ROLE[roleOf(p)].name})` : `P${p}`;
+const listPlayers = (ps) => { const n = ps.map((p) => `P${p}`); return n.length < 2 ? n.join("") : n.slice(0, -1).join(", ") + " and " + n.at(-1); };
+const short = (s, n) => (s && s.length > n ? s.slice(0, n - 1).trimEnd() + "…" : s || "");
+const persona = (p) => (T.config?.personalities?.[String(p)] || "").split(";")[0];
+const isAuto = (txt) => !txt || txt.startsWith("(automatic");
+
+/* "said reject, voted approve": compare a player's last statement on this proposal with their vote */
+const REJ = /\b(reject|rejecting|rejected|vote no|voting no|against|block it|nope)\b/i;
+const APP = /\b(approve|approving|approved|yes|support|i'?m in|back (this|it)|on board|let'?s go|go for it)\b/i;
+function intent(text) {
+  if (!text) return null;
+  const r = REJ.test(text), a = APP.test(text);
+  return r && !a ? "reject" : a && !r ? "approve" : null;
+}
+
+/* ------------------------------------------------------------ steps + snapshots */
+function buildSteps(t) {
+  const out = [{ kind: "deal" }];
+  for (const e of t.events) out.push({ kind: e.phase, e });
+  if (t.result) out.push({ kind: "end" });
+
+  const st = { quests: [], rej: 0, leader: null, team: null, quest: 1, attempt: 1, talk: {}, votes: null, cards: null, target: null, flags: {} };
+  for (const s of out) {
+    const e = s.e;
+    st.speaker = null; st.cards = null;
+    if (s.kind === "propose") {
+      Object.assign(st, { leader: e.actor, team: e.action.team, quest: e.quest, attempt: e.attempt, talk: {}, votes: null, flags: {} });
+      st.talk[e.actor] = e.public_statement; st.speaker = e.actor;
+    } else if (s.kind === "discuss") {
+      st.talk = { ...st.talk, [e.actor]: e.public_statement }; st.speaker = e.actor;
+    } else if (s.kind === "vote") {
+      st.votes = e.votes; st.team = e.team; st.leader = e.leader;
+      st.flags = {};
+      for (const [p, v] of Object.entries(e.votes)) {
+        const said = intent(st.talk[p]);
+        if (said && said !== v) st.flags[p] = said;
+      }
+      s.flags = { ...st.flags };
+      st.rej = e.approved ? 0 : st.rej + 1;
+    } else if (s.kind === "quest") {
+      st.quests = [...st.quests, { ok: e.succeeded, fails: e.fails, team: e.team }];
+      st.cards = e; st.votes = null; st.flags = {};
+    } else if (s.kind === "assassinate") {
+      st.target = e.action.target; st.speaker = e.actor; st.team = null; st.votes = null;
+    }
+    s.snap = JSON.parse(JSON.stringify(st));
+  }
+  return out;
+}
+
+/* ------------------------------------------------------------ rendering */
+function render() {
+  if (!T) return;
+  const s = steps[idx], snap = s.snap;
+  const final = s.kind === "end";
+  renderTracks(snap, s);
+  renderSeats(s, snap, final);
+  renderCenter(s, snap);
+  renderNow(s, snap);
+  renderChronicle();
+  $("scrub").max = steps.length - 1; $("scrub").value = idx;
+  $("stepinfo").textContent = `Step ${idx + 1} of ${steps.length}`;
+  $("play").textContent = playing ? "Pause" : "Play";
+}
+
+function renderTracks(snap, s) {
+  const done = snap.quests.length;
+  $("questTrack").innerHTML = SIZES.map((n, i) => {
+    const q = snap.quests[i];
+    const cls = q ? (q.ok ? "ok" : "fail") : (i === done && s.kind !== "end" ? "current-q" : "");
+    const label = q ? (q.ok ? "✓" : q.fails) : n;
+    const title = q ? (q.ok ? `Quest ${i + 1} succeeded` : `Quest ${i + 1} failed with ${q.fails} fail card${q.fails > 1 ? "s" : ""}`) : `Quest ${i + 1} needs ${n} players`;
+    return `<span class="quest-pip ${cls}" title="${title}">${label}</span>`;
+  }).join("");
+  $("rejTrack").innerHTML = [0, 1, 2, 3, 4].map((i) => `<span class="rej-pip ${i < snap.rej ? "on" : ""}" title="${i === 4 ? "A fifth rejected team means Evil wins" : ""}"></span>`).join("");
+}
+
+function renderSeats(s, snap, final) {
+  const showRoles = god || final;
+  const pending = (T.live && T.pending && idx === steps.length - 1) ? T.pending.map(String) : [];
+  let seats = "", tokens = "";
+  for (let p = 0; p < 5; p++) {
+    const [x, y] = seatXY(p, R_SEAT);
+    const team = showRoles ? teamOf(p) : "";
+    const cls = ["seat", team, snap.speaker === p ? "speaking" : ""].join(" ");
+    seats += `<g class="${cls}"><title>P${p}${showRoles ? " · " + ROLE[roleOf(p)].name : ""}: ${esc(persona(p))}</title>`;
+    seats += `<circle class="seat-ring" cx="${x}" cy="${y}" r="40"/>`;
+    seats += `<text class="seat-label" x="${x}" y="${y}">P${p}</text>`;
+    if (showRoles) seats += `<text class="seat-role" x="${x}" y="${p === 0 ? y - 50 : y + 60}">${ROLE[roleOf(p)].name}</text>`;
+    if (snap.leader === p && !final) {
+      const cx = x + 30, cy = y - 34;
+      seats += `<path class="crown" d="M${cx - 13} ${cy + 7} L${cx - 13} ${cy - 5} L${cx - 6} ${cy + 1} L${cx} ${cy - 9} L${cx + 6} ${cy + 1} L${cx + 13} ${cy - 5} L${cx + 13} ${cy + 7} Z"><title>Leader</title></path>`;
+    }
+    if (snap.target === p) seats += `<circle class="target-ring" cx="${x}" cy="${y}" r="50"/>`;
+    if (pending.includes(String(p))) seats += `<text class="thinking" x="${x}" y="${p === 0 ? y + 62 : y - 52}">thinking…</text>`;
+    seats += `</g>`;
+
+    if (snap.team && snap.team.includes(p) && !final) {
+      const [tx, ty] = seatXY(p, R_TEAM);
+      tokens += `<circle class="team-token" cx="${tx}" cy="${ty}" r="13"><title>On the proposed team</title></circle>`;
+    }
+    if (snap.votes && snap.votes[String(p)]) {
+      const v = snap.votes[String(p)];
+      const [vx, vy] = seatXY(p, R_VOTE);
+      tokens += `<circle class="vote-token ${v}" cx="${vx}" cy="${vy}" r="15"><title>P${p} voted ${v}</title></circle>`;
+      tokens += `<text class="vote-mark ${v}" x="${vx}" y="${vy}">${v === "approve" ? "✓" : "✗"}</text>`;
+      if (snap.flags[String(p)]) tokens += `<circle class="flag-dot" cx="${vx + 13}" cy="${vy - 13}" r="6"><title>Said ${snap.flags[String(p)]}, voted ${v}</title></circle>`;
+    }
+  }
+  $("layer-seats").innerHTML = seats;
+  $("layer-tokens").innerHTML = tokens;
+}
+
+function renderCenter(s, snap) {
+  const e = s.e;
+  let html = "";
+  if (s.kind === "deal") html = `<div class="caption">The table is set</div><div class="sub">5 agents, 2 secretly Evil</div>`;
+  else if (s.kind === "propose" || s.kind === "discuss") html = `<div class="caption">Quest ${snap.quest}</div><div class="sub">Proposal ${snap.attempt}, team of ${SIZES[snap.quest - 1]}</div>`;
+  else if (s.kind === "vote") {
+    const yes = Object.values(e.votes).filter((v) => v === "approve").length;
+    html = `<div class="caption">${e.approved ? "Approved" : "Rejected"} ${yes} to ${5 - yes}</div><div class="sub">Quest ${e.quest}, proposal ${e.attempt}</div>`;
+  } else if (s.kind === "quest") {
+    const n = e.team.length, fails = e.fails;
+    const order = Array.from({ length: n }, (_, i) => (i < n - fails ? "ok" : "fail"));
+    html = `<div class="caption">Quest ${e.quest} ${e.succeeded ? "succeeds" : "fails"}</div>`;
+    html += `<div class="cards">${order.map((c, i) => `<div class="card ${c}" style="animation-delay:${i * 0.18}s"><div class="face back"></div><div class="face front">${c === "ok" ? "✓" : "✗"}</div></div>`).join("")}</div>`;
+  } else if (s.kind === "assassinate") html = `<div class="caption">The Assassin strikes</div><div class="sub">Naming P${e.action.target} as Merlin</div>`;
+  $("center").innerHTML = s.kind === "end" ? "" : html;
+
+  if (s.kind === "end") {
+    const r = T.result;
+    const how = {
+      merlin_assassinated: `The Assassin named P${r.merlin_guess}, and P${r.merlin_actual} was Merlin.`,
+      three_quests_succeeded: `Three quests succeeded and the Assassin named P${r.merlin_guess}. Merlin was P${r.merlin_actual} and survived.`,
+      three_quests_failed: "Three quests failed.",
+      five_rejections: "Five teams in a row were rejected.",
+    }[r.reason] || r.reason;
+    $("bannerSlot").innerHTML = `<div class="banner"><div class="w ${r.winner}">${r.winner === "good" ? "Good wins" : "Evil wins"}</div><p>${how}</p></div>`;
+  } else $("bannerSlot").innerHTML = "";
+}
+
+function duo(thinks, says, who) {
+  const showThinks = god && thinks;
+  const t = showThinks ? `<div class="thinks"><div class="duo-head">${who} thinks</div>${esc(thinks)}</div>` : "";
+  const sy = says ? `<div class="says"><div class="duo-head">${who} says</div>${esc(says)}</div>` : "";
+  return `<div class="duo ${showThinks && says ? "" : "single"}">${t}${sy}</div>`;
+}
+
+function renderNow(s, snap) {
+  const e = s.e;
+  let h = "";
+  if (s.kind === "deal") {
+    h = `<h2>Five agents take their seats</h2><div class="meta">Three serve Arthur and two serve Mordred. Each knows only what their role allows.</div>`;
+    if (god) {
+      h += `<div class="rows">` + [0, 1, 2, 3, 4].map((p) => `<div class="row"><span>${name(p)}</span><span class="${teamOf(p)}-t">${teamOf(p) === "good" ? "Good" : "Evil"}</span><span class="why">${esc(persona(p))}</span></div>`).join("") + `</div>`;
+    } else h += `<p class="empty">Press Play, or turn on Show secrets to see every role and every private thought.</p>`;
+  } else if (s.kind === "propose") {
+    h = `<h2>${name(e.actor)} proposes ${listPlayers(e.action.team)}</h2><div class="meta">Quest ${e.quest}, proposal ${e.attempt}. Plays as: ${esc(persona(e.actor))}.</div>`;
+    h += duo(e.private_reasoning, e.public_statement, `P${e.actor}`);
+  } else if (s.kind === "discuss") {
+    h = `<h2>${name(e.actor)} speaks</h2><div class="meta">On the team of ${listPlayers(snap.team || [])}. Plays as: ${esc(persona(e.actor))}.</div>`;
+    h += duo(e.private_reasoning, e.public_statement, `P${e.actor}`);
+  } else if (s.kind === "vote") {
+    const yes = Object.values(e.votes).filter((v) => v === "approve").length;
+    h = `<h2>The vote: ${e.approved ? "approved" : "rejected"} ${yes} to ${5 - yes}</h2><div class="meta">Team ${listPlayers(e.team)}, proposed by P${e.leader}. Votes are cast together and revealed with names.</div><div class="rows">`;
+    for (let p = 0; p < 5; p++) {
+      const v = e.votes[String(p)], f = s.flags[String(p)];
+      h += `<div class="row"><span>${name(p)}</span><span><span class="pill ${v}">${v}</span></span><span>`;
+      if (f) h += `<span class="flag">Said ${f}, voted ${v}</span>`;
+      if (god) h += `<span class="why">${esc(e.reasoning?.[String(p)])}</span>`;
+      h += `</span></div>`;
+    }
+    h += `</div>`;
+  } else if (s.kind === "quest") {
+    h = `<h2>Quest ${e.quest} ${e.succeeded ? "succeeds" : `fails with ${e.fails} fail card${e.fails > 1 ? "s" : ""}`}</h2>`;
+    h += `<div class="meta">Team ${listPlayers(e.team)}. Only the number of fail cards is revealed to the table.</div>`;
+    if (god) {
+      h += `<div class="rows">` + e.team.map((p) => {
+        const c = e.cards[String(p)], why = e.reasoning?.[String(p)];
+        return `<div class="row"><span>${name(p)}</span><span><span class="pill ${c}">${c}</span></span><span class="why">${isAuto(why) ? "Good players can only play success." : esc(why)}</span></div>`;
+      }).join("") + `</div>`;
+    }
+  } else if (s.kind === "assassinate") {
+    h = `<h2>${name(e.actor, true)} names P${e.action.target} as Merlin</h2><div class="meta">Good won three quests, so the Assassin gets one guess. A correct guess wins the game for Evil.</div>`;
+    h += duo(e.private_reasoning, e.public_statement, `P${e.actor}`);
+    if (!god) h += `<div class="thinks" style="margin-top:8px"><div class="duo-head">P${e.actor}'s reasoning</div>${esc(e.private_reasoning)}</div>`;
+  } else if (s.kind === "end") {
+    const r = T.result;
+    h = `<h2>${r.winner === "good" ? "Good wins" : "Evil wins"}</h2><div class="meta">Every role, revealed.</div><div class="rows">`;
+    h += [0, 1, 2, 3, 4].map((p) => `<div class="row"><span>${name(p, true)}</span><span class="${teamOf(p)}-t">${teamOf(p) === "good" ? "Good" : "Evil"}</span><span class="why">${esc(persona(p))}</span></div>`).join("") + `</div>`;
+    const st = T.stats || {};
+    h += `<p class="meta" style="margin-top:12px">${st.proposals ?? "?"} proposals, ${st.llm_calls ?? "?"} model calls, ${st.parse_failures ?? 0} fallbacks${st.duration_s ? `, ${Math.round(st.duration_s / 60)} minutes` : ""}.</p>`;
+  }
+  $("now").innerHTML = h;
+}
+
+function chronicleLine(s) {
+  const e = s.e;
+  switch (s.kind) {
+    case "deal": return "Roles dealt";
+    case "propose": return `<span class="q">${plainName(e.actor)}</span> proposes ${listPlayers(e.action.team)}`;
+    case "discuss": return `<span class="q">${plainName(e.actor)}:</span> “${esc(short(e.public_statement, 90))}”`;
+    case "vote": {
+      const yes = Object.values(e.votes).filter((v) => v === "approve").length;
+      const fl = Object.entries(s.flags).map(([p, f]) => `<span class="f">P${p} said ${f}, voted ${e.votes[p]}</span>`).join("; ");
+      return `Vote ${e.approved ? "approved" : "rejected"} ${yes} to ${5 - yes}${fl ? ". " + fl : ""}`;
+    }
+    case "quest": return e.succeeded ? `<span class="res-ok">Quest ${e.quest} succeeded</span>` : `<span class="res-fail">Quest ${e.quest} failed</span> (${e.fails} fail)`;
+    case "assassinate": return `Assassin names P${e.action.target} as Merlin`;
+    case "end": return `<strong>${T.result.winner === "good" ? "Good wins" : "Evil wins"}</strong>`;
+  }
+  return s.kind;
+}
+
+function renderChronicle() {
+  let html = "", lastQ = null;
+  steps.forEach((s, i) => {
+    const q = s.e?.quest;
+    if (q && q !== lastQ && (s.kind === "propose")) { html += `<h3 class="${i > idx ? "entry future" : ""}">Quest ${q}</h3>`; lastQ = q; }
+    if (s.kind === "assassinate" || s.kind === "end") { if (lastQ !== "end") { html += `<h3 class="${i > idx ? "entry future" : ""}">Endgame</h3>`; lastQ = "end"; } }
+    html += `<button class="entry ${i === idx ? "current" : ""} ${i > idx ? "future" : ""}" data-i="${i}">${chronicleLine(s)}</button>`;
+  });
+  const box = $("chronicle");
+  box.innerHTML = html;
+  const cur = box.querySelector(".entry.current");
+  if (cur) cur.scrollIntoView({ block: "nearest" });
+}
+
+/* ------------------------------------------------------------ playback */
+function dwell(s) {
+  const e = s.e || {};
+  let chars = (e.public_statement || "").length;
+  if (god) chars += (e.private_reasoning || "").length * 0.6;
+  if (s.kind === "vote") chars = god ? 500 : 120;
+  if (s.kind === "quest") chars = god ? 300 : 120;
+  if (s.kind === "end") chars = 200;
+  return Math.min(1400 + chars * 32, 12000) / Number($("speed").value);
+}
+function go(i) { idx = Math.max(0, Math.min(steps.length - 1, i)); render(); }
+function tick() {
+  clearTimeout(timer);
+  if (!playing) return;
+  if (idx >= steps.length - 1) { if (!$("follow").checked) { playing = false; render(); } else timer = setTimeout(tick, 1500); return; }
+  timer = setTimeout(() => { go(idx + 1); tick(); }, dwell(steps[idx]));
+}
+function setPlaying(v) { playing = v; render(); tick(); }
+
+/* ------------------------------------------------------------ loading */
+function useTranscript(t, url, keepPosition) {
+  const wasAtEnd = steps.length && idx === steps.length - 1;
+  T = t; sourceUrl = url;
+  steps = buildSteps(t);
+  if (!keepPosition) idx = 0;
+  else if (wasAtEnd && !playing) idx = steps.length - 1;
+  idx = Math.min(idx, steps.length - 1);
+  render();
+}
+async function fetchJson(url) {
+  const r = await fetch(url + (url.includes("?") ? "&" : "?") + "t=" + Date.now(), { cache: "no-store" });
+  if (!r.ok) throw new Error(`${r.status} for ${url}`);
+  return r.json();
+}
+const isLiveUrl = (u) => /\/live_[^/]*\.json$/.test(u || "");
+async function loadUrl(url) {
+  try {
+    const t = await fetchJson(url);
+    useTranscript(t, url, false);
+    if (isLiveUrl(url)) { $("follow").checked = true; go(steps.length - 1); setPlaying(true); }
+    else setPlaying(false);
+  } catch (err) { showError(`Could not load ${url}: ${err.message}`); }
+}
+async function listTranscripts() {
+  const html = await (await fetch("transcripts/", { cache: "no-store" })).text();
+  return [...new Set([...html.matchAll(/href="([^"?#]+\.json)"/g)].map((m) => decodeURIComponent(m[1]).split("/").pop()))]
+    .filter((f) => !f.startsWith("fake_"));
+}
+/* A finished live game's file is removed; find its final transcript by game id. */
+async function finalFileFor(gameId) {
+  const files = await listTranscripts();
+  const hit = files.find((f) => f.endsWith(`_${gameId.slice(0, 8)}.json`));
+  return hit ? "transcripts/" + hit : null;
+}
+function showError(msg) { $("now").innerHTML = `<p class="empty">${esc(msg)}</p>`; }
+
+function label(f, t) {
+  const m = f.match(/(\d{4})(\d{2})(\d{2})-(\d{2})(\d{2})/);
+  let when = f;
+  if (m) {
+    const d = new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]);
+    when = d.toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  }
+  if (f.startsWith("live_")) {
+    const started = t?.created_at ? new Date(t.created_at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) : "";
+    return `Live game${started ? ", started " + started : ""} (${t?.events?.length ?? 0} moves so far)`;
+  }
+  if (!t?.result) return `${when}, in progress`;
+  const why = { merlin_assassinated: "Merlin assassinated", three_quests_succeeded: "Merlin survived", three_quests_failed: "3 quests failed", five_rejections: "5 rejections" }[t.result.reason] || t.result.reason;
+  return `${when}: ${t.result.winner === "good" ? "Good" : "Evil"} wins, ${why}`;
+}
+
+async function loadIndex() {
+  const picker = $("picker");
+  let files = [];
+  try {
+    files = (await listTranscripts()).sort().reverse();
+    files = [...files.filter((f) => f.startsWith("live_")), ...files.filter((f) => !f.startsWith("live_"))];
+  } catch {
+    picker.innerHTML = `<option value="">No saved games found</option>`;
+    showEmpty(true);
+    return;
+  }
+  if (!files.length) { picker.innerHTML = `<option value="">No saved games yet</option>`; showEmpty(false); return; }
+  const metas = await Promise.all(files.map((f) => fetchJson("transcripts/" + f).catch(() => null)));
+  picker.innerHTML = files.map((f, i) => `<option value="transcripts/${esc(f)}">${esc(label(f, metas[i]))}</option>`).join("");
+  const want = new URLSearchParams(location.search).get("game");
+  const first = want || "transcripts/" + files[0];
+  picker.value = first;
+  loadUrl(first);
+}
+function showEmpty(noServer) {
+  $("now").innerHTML = noServer
+    ? `<h2>Open a game to watch</h2><p class="empty">To browse saved games, start a local server in the avalon folder with <code>python -m http.server</code> and visit <code>localhost:8000/viewer.html</code>. You can also drop a transcript file onto this page, or use Open file.</p>`
+    : `<h2>No saved games yet</h2><p class="empty">Run <code>python run.py</code> to play a game. It appears here when it finishes, or right away with Follow live.</p>`;
+}
+
+/* ------------------------------------------------------------ wiring */
+$("picker").addEventListener("change", (ev) => ev.target.value && loadUrl(ev.target.value));
+$("file").addEventListener("change", (ev) => readFile(ev.target.files[0]));
+function readFile(f) {
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => { try { useTranscript(JSON.parse(r.result), null, false); setPlaying(false); } catch (err) { showError("That file is not a valid transcript: " + err.message); } };
+  r.readAsText(f);
+}
+document.addEventListener("dragover", (ev) => { ev.preventDefault(); document.body.classList.add("dragging"); });
+document.addEventListener("dragleave", (ev) => { if (!ev.relatedTarget) document.body.classList.remove("dragging"); });
+document.addEventListener("drop", (ev) => { ev.preventDefault(); document.body.classList.remove("dragging"); readFile(ev.dataTransfer.files[0]); });
+
+$("god").addEventListener("click", () => { god = !god; $("god").setAttribute("aria-pressed", god); $("god").textContent = god ? "Hide secrets" : "Show secrets"; render(); });
+$("play").addEventListener("click", () => setPlaying(!playing));
+$("prev").addEventListener("click", () => { setPlaying(false); go(idx - 1); });
+$("next").addEventListener("click", () => { setPlaying(false); go(idx + 1); });
+$("first").addEventListener("click", () => { setPlaying(false); go(0); });
+$("last").addEventListener("click", () => { setPlaying(false); go(steps.length - 1); });
+$("scrub").addEventListener("input", (ev) => { setPlaying(false); go(+ev.target.value); });
+$("speed").addEventListener("change", tick);
+$("chronicle").addEventListener("click", (ev) => { const b = ev.target.closest(".entry"); if (b) { setPlaying(false); go(+b.dataset.i); } });
+document.addEventListener("keydown", (ev) => {
+  if (ev.target.matches("input, select, textarea")) return;
+  if (ev.key === " ") { ev.preventDefault(); setPlaying(!playing); }
+  else if (ev.key === "ArrowRight") { setPlaying(false); go(idx + 1); }
+  else if (ev.key === "ArrowLeft") { setPlaying(false); go(idx - 1); }
+  else if (ev.key === "Home") { setPlaying(false); go(0); }
+  else if (ev.key === "End") { setPlaying(false); go(steps.length - 1); }
+  else if (ev.key.toLowerCase() === "s") $("god").click();
+});
+
+/* Follow live: re-read the current file every 3 s and append new events. */
+setInterval(async () => {
+  if (!$("follow").checked || !sourceUrl) return;
+  try {
+    let t;
+    try { t = await fetchJson(sourceUrl); }
+    catch (err) {
+      if (!isLiveUrl(sourceUrl) || !T?.game_id) throw err;
+      const fin = await finalFileFor(T.game_id);   // live game finished; switch to its saved file
+      if (!fin) throw err;
+      sourceUrl = fin; t = await fetchJson(fin);
+    }
+    const changed = t.events.length !== T.events.length || !!t.result !== !!T.result || JSON.stringify(t.pending) !== JSON.stringify(T.pending);
+    if (changed) useTranscript(t, sourceUrl, true);
+  } catch { /* file mid-write; try again next tick */ }
+}, 3000);
+
+loadIndex();
+</script>
+</body>
+</html>

@@ -10,7 +10,7 @@ public statement, stored separately. Spec: `PLAN.md`.
 | 0–0.5 | API smoke test | Anthropic: no credits. **Using Fetch.ai ASI:One** via `openai_compat.py` |
 | 0.5–2.5 | Rules engine + random bots | Done. 11 tests, 1000 random games, 0 violations |
 | 2.5–5 | Agents, prompts, transcripts | Built and tested offline (fake client). **Needs first real game** |
-| 5–7 | `viewer.html` replay | Next |
+| 5–7 | `viewer.html` replay + live view | Done |
 
 ## Run
 
@@ -36,6 +36,19 @@ python run.py --role-model assassin=claude-sonnet-4-5 --games 10 --parallel 4
 Transcripts go to `transcripts/` (one JSON per game; `fake_*` files are gitignored).
 `AVALON_MODEL` env var or `--model` sets the default model for every role.
 
+## Watch games (viewer)
+
+```bash
+python -m http.server 8000          # in this folder, in its own Terminal window
+# then open http://localhost:8000/viewer.html
+```
+
+Pick a game from the menu (games in progress are listed first as "Live game"). **Show secrets** (S) reveals
+roles and every private thought next to what was said out loud. Space plays/pauses, ←/→ step, Home/End jump.
+**Follow live** keeps reading a game while `run.py` plays it; `run.py` writes `transcripts/live_<seed>.json`
+during each game (disable with `--no-live`). Purple dots and "said X, voted Y" notes mark players whose vote
+contradicted what they said. You can also drag a transcript file onto the page without the server.
+
 ## Files
 
 | File | What |
@@ -48,6 +61,7 @@ Transcripts go to `transcripts/` (one JSON per game; `fake_*` files are gitignor
 | `openai_compat.py` | Adapter: any OpenAI-compatible API (ASI:One, OpenRouter, Groq) behind the same interface |
 | `fake_client.py` | Offline stand-in for the Anthropic client (random, sometimes invalid, tool calls) |
 | `sim.py` | Random-bot driver + invariant checks |
+| `viewer.html` | Round-table replay and live view: tracks, votes, quest cards, thoughts vs speech |
 
 ## Design notes
 
