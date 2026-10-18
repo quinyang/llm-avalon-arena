@@ -27,7 +27,9 @@ RULES = """RULES (5 players: 3 Good, 2 Evil. Players are P0-P4.)
 - Approved: each team member secretly plays Success or Fail. Good players can only play Success;
   Evil may play either. Only the NUMBER of Fail cards is revealed. Any Fail = the quest fails.
 - 3 failed quests = Evil wins. 3 successful quests = the Assassin gets one guess at who Merlin is;
-  a correct guess means Evil wins anyway, otherwise Good wins."""
+  a correct guess means Evil wins anyway, otherwise Good wins.
+- A successful quest does NOT prove its members are Good: Evil players may play Success to build
+  trust. Only Fail cards are hard evidence."""
 
 ROLE_TITLES = {
     "merlin": "Merlin",
@@ -194,9 +196,16 @@ def phase_instruction(pub: dict, me: int, legal: dict) -> str:
             "(a 5th rejection means Evil wins). Call vote."
         )
     if t == "quest":
+        g, e = pub["score"]["good"], pub["score"]["evil"]
+        stakes = ""
+        if g == 2:
+            stakes = (" If this quest succeeds, Good reaches 3 wins and Evil's ONLY remaining path is the "
+                      "Assassin correctly naming Merlin.")
+        elif e == 2:
+            stakes = " One more failed quest wins the game for Evil."
         return (
-            f"You are on the approved quest team {team}. Choose your card. Only the number of Fail "
-            "cards will be revealed. Call play_card."
+            f"You are on the approved quest team {team}. Score: Good {g} - Evil {e}.{stakes} "
+            "Choose your card. Only the number of Fail cards will be revealed. Call play_card."
         )
     if t == "assassinate":
         return (
