@@ -10,12 +10,12 @@ import json
 
 from agent import LLMAgent
 from game import AvalonGame
-from run import PROVIDER_DEFAULT_MODELS, make_client
+from run import PROVIDER_DEFAULT_MODELS, default_provider, make_client
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--provider", choices=["anthropic", "asi", "fake"], default="anthropic")
+    ap.add_argument("--provider", choices=["anthropic", "asi", "fake"], default=default_provider())
     ap.add_argument("--model", default=None)
     args = ap.parse_args()
     model = args.model or PROVIDER_DEFAULT_MODELS[args.provider]

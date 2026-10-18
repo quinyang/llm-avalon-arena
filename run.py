@@ -24,6 +24,15 @@ from game import AvalonGame, IllegalAction, Phase
 from prompts import character_summary, make_characters, roster_line
 from roles import ROLES_5P, Team, team_of
 
+def default_provider() -> str:
+    """AVALON_PROVIDER wins; otherwise use whichever API key is set (ASI if only its key exists)."""
+    if os.environ.get("AVALON_PROVIDER"):
+        return os.environ["AVALON_PROVIDER"]
+    if os.environ.get("ASI_ONE_API_KEY") and not os.environ.get("ANTHROPIC_API_KEY"):
+        return "asi"
+    return "anthropic"
+
+
 PROVIDER_DEFAULT_MODELS = {"anthropic": "claude-haiku-4-5", "asi": "asi1-fast", "fake": "fake"}
 
 # ANSI colors for the live terminal view
@@ -232,7 +241,7 @@ def parse_args():
     ap.add_argument("--games", type=int, default=1)
     ap.add_argument("--parallel", type=int, default=1, help="games to run concurrently")
     ap.add_argument("--provider", choices=["anthropic", "asi", "fake"],
-                    default=os.environ.get("AVALON_PROVIDER", "anthropic"))
+                    default=default_provider())
     ap.add_argument("--model", default=os.environ.get("AVALON_MODEL"),
                     help="model for every role (default depends on provider)")
     ap.add_argument("--role-model", action="append", default=[], metavar="ROLE=MODEL",
